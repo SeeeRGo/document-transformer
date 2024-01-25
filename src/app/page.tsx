@@ -1,113 +1,421 @@
-import Image from "next/image";
+"use client"
+import {
+  Document,
+  Packer,
+  Table,
+  TableRow,
+  Paragraph,
+  TableCell,
+  WidthType,
+} from "docx";
+import { saveAs } from "file-saver";
+const position = 'Руководитель проекта (Senior)/Системный аналитик'
+const name = 'Макаренко Алессия Алексеевна'
+const birthdate = '07.04.1997'
+const employer = 'ООО “КОЗИСОФТ”'
+const employerAddress = 'Самарская обл., г. Тольятти, Новый проезд, д.8'
+const phoneNumber = '7 (928) 271-13-31'
+const contactPerson = 'Контакт - Прохорова Инна Игоревна (+79277766331)'
+const experience = '5 лет'
+const projects = [
+  {
+    start: '09.11.2023',
+    end: 'Текущий момент',
+    description: `Доработки MES КХЦ НЛМК Руководитель проекта  /Системный аналитик
+    Объем работ:
+    1. Работа с требованиями; 
+    2. Участие в планировании и оценке задач;
+    3. Планирование спринтов;
+    4. Приоритизация бэклога, работа с трекером;
+    5. Регулярная обратная связь с клиентом; 
+    6. Проведение демонстраций функционала продукта;
+    7. Постановка рабочего процесса (разработка, тестирование, работа с требованиями);
+    8. Построение качественного взаимодействия внутри команды;
+    9. Распределения работ и ответственности за выполнение каждого этапа;
+    10. Контроль сроков исполнения, анализ рисков и своевременное уведомление заказчика; 
+    11. Составление плана разработки и реализации (RoadMap);
+    12. Проведение ретроспективы по результатам спринта;
+    13. Контроль за качеством конечного продукта;
+    14. Ведение документов и составление отчетности.
+    15. Построение ERD-диаграм PIM системы с нуля
+    Следование SCRUM-методологии`,
+  },
+  {
+    start: '21.04.2023',
+    end: '08.11.2023',
+    description: `Оптимизатор шихты НЛМК  Руководитель проекта / Системный аналитик
+    Развитие программного обеспечения-сервисов для решения «MES КХП»
+    Реализуется в соответствии со стратегией развития Умного производства, направленной на повышение эффективности, развития низкозатратного производства КХП и совершенствования процессов планирования и организации производства. Построение прослеживаемого плана опытно-промышленного коксования позволит оперативно оценивать качественные и количественные характеристики компонентов угольной шихты произведенных в рамках экспериментального шихтования в ИС “MES КХП” отслеживая процесс производства от рецептуры до готового изделия.
+    Объем работ:
+    1. Работа с требованиями; 
+    2. Участие в планировании и оценке задач;
+    3. Планирование спринтов;
+    4. Приоритизация бэклога, работа с трекером;
+    5. Регулярная обратная связь с клиентом; 
+    6. Проведение демонстраций функционала продукта;
+    7. Постановка рабочего процесса (разработка, тестирование, работа с требованиями);
+    8. Построение качественного взаимодействия внутри команды;
+    9. Распределения работ и ответственности за выполнение каждого этапа;
+    10. Контроль сроков исполнения, анализ рисков и своевременное уведомление заказчика; 
+    11. Составление плана разработки и реализации (RoadMap);
+    12. Проведение ретроспективы по результатам спринта;
+    13. Контроль за качеством конечного продукта;
+    14. Ведение документов и составление отчетности.
+    15. Построение ERD-диаграм PIM системы с нуля
+    Следование SCRUM-методологии`,
+  },
+  {
+    start: '16.11.2022',
+    end: '31.03.2023',
+    description: `Мосбиржа / Руководитель проекта /Системный аналитик
+    Система связана с интеграцией решений от ЦРТ (бот-распознаватель голоса) и бота от CraftTalk в Мосбиржу, автоматизацией клиентских обращений и связанным с этим сокращением костов.
+    Объем работ:
+    1. Работа с требованиями; 
+    2. Участие в планировании и оценке задач;
+    3. Планирование спринтов;
+    4. Приоритизация бэклога, работа с трекером;
+    5. Регулярная обратная связь с клиентом; 
+    6. Проведение демонстраций функционала продукта;
+    7. Постановка рабочего процесса (разработка, тестирование, работа с требованиями);
+    8. Построение качественного взаимодействия внутри команды;
+    9. Распределения работ и ответственности за выполнение каждого этапа;
+    10. Контроль сроков исполнения, анализ рисков и своевременное уведомление заказчика; 
+    11. Составление плана разработки и реализации (RoadMap);
+    12. Проведение ретроспективы по результатам спринта;
+    13. Контроль за качеством конечного продукта;
+    14. Ведение документов и составление отчетности.
+    15. Построение ERD-диаграм PIM системы с нуля
+    Следование SCRUM-методологии`,
+  },
+  {
+    start: '11.07.2022',
+    end: '17.10.2022',
+    description: `Колеса даром  / Руководитель проекта /Системный аналитик
+    Разработка кастомной автоматизированной системы управления большими массивами данных о товарах (PIM)
+    Объем работ:
+    1. Работа с требованиями; 
+    2. Участие в планировании и оценке задач;
+    3. Планирование спринтов;
+    4. Приоритизация бэклога, работа с трекером;
+    5. Регулярная обратная связь с клиентом; 
+    6. Проведение демонстраций функционала продукта;
+    7. Постановка рабочего процесса (разработка, тестирование, работа с требованиями);
+    8. Построение качественного взаимодействия внутри команды;
+    9. Распределения работ и ответственности за выполнение каждого этапа;
+    10. Контроль сроков исполнения, анализ рисков и своевременное уведомление заказчика; 
+    11. Составление плана разработки и реализации (RoadMap);
+    12. Проведение ретроспективы по результатам спринта;
+    13. Контроль за качеством конечного продукта;
+    14. Ведение документов и составление отчетности.
+    15. Построение ERD-диаграм PIM системы с нуля
+    Следование SCRUM-методологии`,
+  },
+]
+
+const document = new Document({
+  sections: [
+    {
+      children: [
+        new Table({
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Должность'
+                    })
+                  ],
+                  columnSpan: 2,
+                }),
+                new TableCell({
+                  children: [],
+                  rowSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: position
+                    })
+                  ],
+                  columnSpan: 2,
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Сведения о кандидате'
+                    })
+                  ],
+                  rowSpan: 4,
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: '1. Имя кандидата'
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: '2. Дата рождения'
+                    })
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: name
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: birthdate
+                    })
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: '3. Профессиональная квалификация'
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: position
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Место работы в настоящее время'
+                    })
+                  ],
+                  rowSpan: 8
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: '4. Наименование организации'
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: employer
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Адрес организации'
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: employerAddress
+                    })
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Телефон'
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Контакт (управляющий/ отв. за кадры)'
+                    })
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: phoneNumber
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: contactPerson
+                    })
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: `Опыт ${position}`
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: `Стаж работы на нынешнем месте ${experience}`
+                    })
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: []
+                }),
+                new TableCell({
+                  children: [],
+                }),
+              ]
+            }),
+          ],
+          width: {
+            size: 10000,
+            type: WidthType.DXA
+          }
+        }),
+        new Paragraph({
+          text: 'Сведения о трудовой деятельности за последние 5 лет'
+        }),
+        new Table({
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'С какого срока'
+                    })
+                  ]
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'По какой срок'
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: 'Предприятие / Должность / соответствующий технический и управленческий опыт'
+                    })
+                  ],
+                }),
+              ]
+            }),
+            ...projects.map(({ start, end, description }) => new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: start
+                    })
+                  ]
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: end
+                    })
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      text: description
+                    })
+                  ],
+                }),
+              ]
+            }))
+          ],
+          width: {
+            size: 10000,
+            type: WidthType.DXA
+          }
+        })
+      ]
+    }
+  ]
+});
 
 export default function Home() {
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      Yeah
+      <button onClick={() => Packer.toBlob(document).then(blob => {
+  console.log(blob);
+  saveAs(blob, "example.docx");
+  console.log("Document created successfully");
+})}>Magic</button>
     </main>
   );
 }
