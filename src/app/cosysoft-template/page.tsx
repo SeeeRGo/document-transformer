@@ -292,50 +292,6 @@ const document = new Document({
             }
           })
         ]),
-        new Table({
-          rows: [
-          ],
-          width: {
-            size: 10000,
-            type: WidthType.DXA
-          }
-        }),
-        new Paragraph({
-          text: 'Сведения о трудовой деятельности за последние 5 лет'
-        }),
-        new Table({
-          rows: [
-            ...projects.map(({ start, end, description }) => new TableRow({
-              children: [
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: start
-                    })
-                  ]
-                }),
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: end
-                    })
-                  ],
-                }),
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: description
-                    })
-                  ],
-                }),
-              ]
-            }))
-          ],
-          width: {
-            size: 10000,
-            type: WidthType.DXA
-          }
-        })
       ]
     }
   ]
