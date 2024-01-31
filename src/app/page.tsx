@@ -91,7 +91,7 @@ export default function CosysoftTemplate() {
           })()
         }}        
       >
-        Конвертировать CV
+        Конвертировать CV в формат Cosysoft
       </Button>
     </main>
   );
