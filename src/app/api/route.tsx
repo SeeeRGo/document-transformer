@@ -1,11 +1,20 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
+import { getTextExtractor } from 'office-text-extractor'
 
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
 export async function POST(request: NextRequest) {
-  const { prompt } = await request.json()
-  if (prompt) {
+  const formData = await request.formData()
+  const resume = formData.get('resume')
+  let input: ArrayBuffer = new ArrayBuffer(0);
+  if (resume instanceof Blob) {
+    input = await resume.arrayBuffer()
+  }
+  const extractor = getTextExtractor()
+  const text = await extractor.extractText({ input: Buffer.from(input), type: 'file'})
+  
+  if (text) {
     const response = await client.chat.completions
       .create({
         model: 'gpt-4-turbo-preview',
@@ -44,7 +53,7 @@ export async function POST(request: NextRequest) {
                 technologiesUsed: string[]
               }[],  
           }
-          ${prompt}`,}
+          ${text}`,}
         ],
         response_format: {"type": "json_object"}
       })
