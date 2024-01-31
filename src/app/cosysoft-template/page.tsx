@@ -325,7 +325,7 @@ export default function Home() {
       <button onClick={async () => {
         axios.post('/api', {
             prompt
-        }).then(({ data }) => Packer.toBlob(createDocument(JSON.parse(data.message))).then(blob => {
+        }).then(({ data: { message } }: { data: { message: string }}) => Packer.toBlob(createDocument(JSON.parse(message))).then(blob => {
           saveAs(blob, "full.docx");
           console.log("Document created successfully");
         }))
