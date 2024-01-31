@@ -1,4 +1,5 @@
 import { Document, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
+import { createHeader } from './createHeader';
 import { CosysoftCV } from './types'
 
 export const createDocument = ({
@@ -14,9 +15,10 @@ export const createDocument = ({
   courses,
   location,
   projects
-}: CosysoftCV): Document => new Document({
+}: CosysoftCV, branded: boolean): Document => new Document({
   sections: [
     {
+      ...createHeader(branded),
       children: [
         new Paragraph({
           text: `ФИО: ${name}`
