@@ -1,4 +1,4 @@
-import { Document, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
+import { AlignmentType, Document, LevelFormat, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { CosysoftCV } from './types'
 
@@ -14,35 +14,101 @@ export const createDocument = ({
   education,
   courses,
   location,
-  projects
+  projects,
+  languages,
 }: CosysoftCV, branded: boolean): Document => new Document({
+  numbering: {
+    config: [
+        {
+          reference: "bullets",
+          levels: [
+            {
+              level: 0,
+              format: "bullet",
+              text: "%1.",
+              alignment: AlignmentType.START,
+            },
+          ],
+        },
+    ],
+},
   sections: [
     {
       ...createHeader(branded),
       children: [
         new Paragraph({
-          text: `ФИО: ${name}`
-        }),
+          children: [new TextRun('ФИО: '), new TextRun({
+            text: name ? `${name}` : '_',
+            highlight: name ? 'red' : undefined,
+          })]
+        }),        
         new Paragraph({
-          text: `<Позиция: ${position}>`
-        }),
+          children: [
+            new TextRun('<Позиция: '), 
+            new TextRun({
+              text: position ? `${position}` : '_',
+              highlight: position ? undefined : 'red',
+            }),
+            new TextRun('>')
+          ]
+        }),        
         new Paragraph({
-          text: `<Грейд: ${grade ?? ''}>`
-        }),
+          children: [
+            new TextRun('<Грейд: '), 
+            new TextRun({
+              text: grade ?? '_',
+              highlight: grade ? undefined : 'red',
+            }),
+            new TextRun('>')
+          ]
+        }),        
         new Paragraph({
-          text: `<Возраст: ${age}>`
-        }),
+          children: [
+            new TextRun('<Возраст: '), 
+            new TextRun({
+              text: `${age}` ?? '_',
+              highlight: age ? undefined : 'red',
+            }),
+            new TextRun('>')
+          ]
+        }),        
         new Paragraph({
-          text: `<Стаж: ${experience}>`
-        }),
+          children: [
+            new TextRun('<Стаж: '), 
+            new TextRun({
+              text: experience ?? '_',
+              highlight: experience ? undefined : 'red',
+            }),
+            new TextRun('>')
+          ]
+        }),        
         new Paragraph({
-          text: `<Локация: ${location}>`
-        }),
+          children: [
+            new TextRun('<Локация: '), 
+            new TextRun({
+              text: location ?? '_',
+              highlight: location ? undefined : 'red',
+            }),
+            new TextRun('>')
+          ]
+        }),        
         new Paragraph({
-          text: `Технические навыки: ${technologies?.join(', ') ?? ''}`
-        }),
+          children: [
+            new TextRun('Технические навыки: '), 
+            new TextRun({
+              text: technologies?.length ? technologies?.join(', ') : '_',
+              highlight: technologies?.length ? undefined : 'red',
+            }),
+          ]
+        }),        
         new Paragraph({
-          text: `Языки программирования: ${programmingLanguages?.join(', ') ?? ''}`
+          children: [
+            new TextRun('Языки программирования: '), 
+            new TextRun({
+              text: programmingLanguages.length ? programmingLanguages?.join(', ') : '_',
+              highlight: programmingLanguages?.length ? undefined : 'red',
+            }),
+          ]
         }),
         new Paragraph({
           text: `Операционные системы: `
@@ -63,13 +129,31 @@ export const createDocument = ({
           text: personalInfo.gender
         }),
         new Paragraph({
-          text: `Иностранные языки: `
+          children: [
+            new TextRun('Иностранные языки: '),
+          ],
+        }),
+        ...languages?.length 
+          ? languages?.flatMap(language => new Paragraph({ text: `${language.name} ${language.level}`}))
+          : [new Paragraph({children: [
+              new TextRun({
+                text: '_',
+                highlight:'red',
+              }),
+            ]})],
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: education && (Object.keys(education)).length ? `Образование: ${education.level}, ${education.institution}, ${education.specialization}, ${education.year}` : '_',
+              highlight: education && (Object.keys(education)).length ? undefined : 'red',
+            })
+          ],
         }),
         new Paragraph({
-          text: `Образование: ${education.level}, ${education.institution}, ${education.specialization}, ${education.year}`
-        }),
-        new Paragraph({
-          text: `Курсы: ${courses}`
+          children: [new TextRun('Курсы: '), new TextRun({
+            text: courses?.length ? courses?.join(', ') : '_',
+            highlight: courses?.length ? undefined : 'red',
+          })],
         }),
         new Paragraph({
           text: `Сертификаты:`
@@ -131,7 +215,12 @@ export const createDocument = ({
                   new TableCell({
                     children: [
                       new Paragraph({
-                        text: project?.role ?? ''
+                        children: [
+                          new TextRun({
+                            text: project?.role ?? '_',
+                            highlight: project?.role ? undefined : 'red',
+                          })
+                        ]
                       })
                     ]
                   }),
@@ -147,11 +236,9 @@ export const createDocument = ({
                     ]
                   }),
                   new TableCell({
-                    children: [
-                      new Paragraph({
-                        text: project?.duties?.join(', ') ?? ''
-                      })
-                    ]
+                    children: project?.duties?.map(duty => new Paragraph({
+                      text: ` -   ${duty}`,
+                    })) ?? []
                   }),
                 ],
               }),

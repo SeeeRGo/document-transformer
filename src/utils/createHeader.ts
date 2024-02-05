@@ -14,10 +14,6 @@ export const createHeader = (branded: boolean) => {
                 width: 200,
                 height: 90,
               },
-              outline: {
-                type: 'noFill',
-                width: 0,
-              }
             }),
           ],
           alignment: AlignmentType.RIGHT,

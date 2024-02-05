@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 import { getTextExtractor } from 'office-text-extractor'
+import { readFileSync } from 'fs';
 
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
@@ -23,12 +24,16 @@ export async function POST(request: NextRequest) {
           {"role": "user", "content": `Parse following CV into JSON fitting this schema {
             name: string,
             position: string,
-            grade: string,
+            grade: string | null,
             age: number,
             experience: string,
             location: string,
             technologies: string[],
             programmingLanguages: string[],
+            languages: {
+              level: string,
+              name: string,
+            }[],
             personalInfo: {
               gender: string,
               birthday: string,
@@ -43,6 +48,7 @@ export async function POST(request: NextRequest) {
               institution: string,
               specialization: string
             },
+            certificates: string[],
             courses: string[],
             projects: {
                 name: string,

@@ -7,6 +7,10 @@ export interface CosysoftCV {
   location: string,
   technologies: string[],
   programmingLanguages: string[],
+  languages: {
+    level: string,
+    name: string,
+  }[],
   personalInfo: {
     gender: string,
     birthday: string,
@@ -21,6 +25,7 @@ export interface CosysoftCV {
     institution: string,
     specialization: string
   },
+  certificates: string[],
   courses: string[],
   projects: {
       name: string,

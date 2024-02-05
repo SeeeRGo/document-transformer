@@ -2,7 +2,7 @@
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useState } from "react";
-import { Button, Checkbox, FormControl, FormControlLabel, FormHelperText, Stack } from "@mui/material"
+import { Alert, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, Snackbar, Stack } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
@@ -24,7 +24,11 @@ export default function CosysoftTemplate() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Stack rowGap={2}>
-        <Controller control={control} name="resume" rules={{ required:  'Поле обязательно к заполнению' }} render={
+        <Controller 
+          control={control}
+          name="resume"
+          // rules={{ required:  'Поле обязательно к заполнению' }}
+          render={
           ({ field: { value, onChange, ...field } }) => {          
             return (
               <FormControl error={!!errors.resume?.message}>
@@ -73,12 +77,12 @@ export default function CosysoftTemplate() {
         onClick={() => {
           setIsLoading(true)
           handleSubmit(async ({ resume, branded }) => {
-            const formData = new FormData()
-            if (resume) {
-              formData.append('resume', resume)
-            }
-            axios.post('/api', formData)
-            .then(({ data: { message } }: { data: { message: string }}) => createFile(message, branded))
+            // const formData = new FormData()
+            // if (resume) {
+            //   formData.append('resume', resume)
+            // }
+            axios.post('/api/playground')
+            .then(({ data: { message } }: { data: { message: string }}) => createFile(message, true))
             .then(({ blob, name }) => {
               saveAs(blob, `${name}.docx`);
               console.log("Document created successfully");
@@ -93,6 +97,11 @@ export default function CosysoftTemplate() {
       >
         Конвертировать CV в формат Cosysoft
       </Button>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>
+        <Alert onClose={() => { setError('') }} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </main>
   );
 }
