@@ -1,4 +1,4 @@
-import { AlignmentType, Document, LevelFormat, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { AlignmentType, Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { CosysoftCV } from './types'
 
@@ -39,7 +39,7 @@ export const createDocument = ({
         new Paragraph({
           children: [new TextRun('ФИО: '), new TextRun({
             text: name ? `${name}` : '_',
-            highlight: name ? 'red' : undefined,
+            highlight: name ? undefined : 'red',
           })]
         }),        
         new Paragraph({

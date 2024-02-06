@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 import { getTextExtractor } from 'office-text-extractor'
-import { readFileSync } from 'fs';
 
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
@@ -16,9 +15,9 @@ export async function POST(request: NextRequest) {
   const text = await extractor.extractText({ input: Buffer.from(input), type: 'file'})
   
   if (text) {
-    const response = await client.chat.completions
-      .create({
-        model: 'gpt-4-turbo-preview',
+    const stream = await client.beta.chat.completions.stream({
+        model: 'gpt-3.5-turbo',
+        stream: true,
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
           {"role": "user", "content": `Parse following CV into JSON fitting this schema {
@@ -61,14 +60,20 @@ export async function POST(request: NextRequest) {
           }
           ${text}`,}
         ],
-        response_format: {"type": "json_object"}
+        // response_format: {"type": "json_object"}
       })
-      .asResponse();
-    const json = await response.json()
-    console.log(`response headers: `, Object.fromEntries(response.headers.entries()));
-    console.log(`response json: `, json);
-    const message = json?.choices?.at(0)?.message?.content ?? {}
-    console.log('first choice', json?.choices?.at(0));
+      // .asResponse();
+    let message = ''
+    
+    for await (const chunk of stream) {
+      message = message.concat(chunk.choices?.at(0)?.delta.content ?? '')
+    }
+    console.log('response', message);
+    // const json = await response.json()
+    // console.log(`response headers: `, Object.fromEntries(response.headers.entries()));
+    // console.log(`response json: `, json);
+    // const message = json?.choices?.at(0)?.message?.content ?? {}
+    // console.log('first choice', json?.choices?.at(0));
     
     return Response.json({ message })
   } else {

@@ -77,12 +77,12 @@ export default function CosysoftTemplate() {
         onClick={() => {
           setIsLoading(true)
           handleSubmit(async ({ resume, branded }) => {
-            // const formData = new FormData()
-            // if (resume) {
-            //   formData.append('resume', resume)
-            // }
-            axios.post('/api/playground')
-            .then(({ data: { message } }: { data: { message: string }}) => createFile(message, true))
+            const formData = new FormData()
+            if (resume) {
+              formData.append('resume', resume)
+            }
+            axios.post('/api', formData)
+            .then(({ data: { message } }: { data: { message: string }}) => createFile(message, branded))
             .then(({ blob, name }) => {
               saveAs(blob, `${name}.docx`);
               console.log("Document created successfully");
