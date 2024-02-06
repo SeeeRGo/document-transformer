@@ -1,12 +1,13 @@
 "use client"
 import axios from "axios";
 import { saveAs } from "file-saver";
-import { useState } from "react";
 import { Alert, Button, Checkbox, FormControl, FormControlLabel, FormHelperText, Snackbar, Stack } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
+import { useCompletion } from "ai/react";
+import { useState } from "react";
 
 export interface Inputs {
   branded: boolean
@@ -20,6 +21,11 @@ export default function CosysoftTemplate() {
   } = useForm<Inputs>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const { completion, complete } = useCompletion({
+    api: '/api'
+  });
+  console.log('completion', completion);
+  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -77,18 +83,24 @@ export default function CosysoftTemplate() {
         onClick={() => {
           setIsLoading(true)
           handleSubmit(async ({ resume, branded }) => {
+            let input: ArrayBuffer = new ArrayBuffer(0);
+            if (resume instanceof Blob) {
+              input = await resume.arrayBuffer()
+            }
+
             const formData = new FormData()
             if (resume) {
               formData.append('resume', resume)
             }
-            axios.post('/api', formData)
-            .then(({ data: { message } }: { data: { message: string }}) => createFile(message, branded))
+            const { data: { message }}: {data: { message: string }} = await axios.post('/api/extract', formData)
+            complete(message)
+            .then((message) => createFile(message ?? '', branded))
             .then(({ blob, name }) => {
               saveAs(blob, `${name}.docx`);
               console.log("Document created successfully");
               setIsLoading(false)          
-
-            }).catch(e => {
+            })
+            .catch(e => {
               setIsLoading(false)
               setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
             })
@@ -97,11 +109,11 @@ export default function CosysoftTemplate() {
       >
         Конвертировать CV в формат Cosysoft
       </Button>
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>
+      {/* <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>
         <Alert onClose={() => { setError('') }} severity="error" sx={{ width: '100%' }}>
           {error}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </main>
   );
 }
