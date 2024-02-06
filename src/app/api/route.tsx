@@ -140,10 +140,6 @@ export async function POST(request: Request) {
         // response_format: {"type": "json_object"}
     })
   
-    const stream = OpenAIStream(res, {
-      async onCompletion(completion) {
-        console.log('completion', completion);
-      }
-    })
+    const stream = OpenAIStream(res)
     return new StreamingTextResponse(stream)
 }

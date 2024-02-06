@@ -8,11 +8,64 @@ import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
 import { useCompletion } from "ai/react";
 import { useState } from "react";
+import OpenAI from "openai";
+import { OpenAIStream } from "ai";
 
 export interface Inputs {
   branded: boolean
   resume: File | undefined
 }
+const client = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+
+const res = async (prompt: string) => await client.chat.completions.create({
+  model: 'gpt-3.5-turbo',
+  stream: true,
+  messages: [
+    {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+    {"role": "user", "content": `Parse following CV into JSON fitting this schema {
+      name: string,
+      position: string,
+      grade: string | null,
+      age: number,
+      experience: string,
+      location: string,
+      technologies: string[],
+      programmingLanguages: string[],
+      languages: {
+        level: string,
+        name: string,
+      }[],
+      personalInfo: {
+        gender: string,
+        birthday: string,
+        citizenship: string,
+        workPermit: string,
+        relocation: string,
+        businessTrips: string
+      },
+      education: {
+        level: string,
+        year: number,
+        institution: string,
+        specialization: string
+      },
+      certificates: string[],
+      courses: string[],
+      projects: {
+          name: string,
+          description: string,
+          duration: string,
+          role: string,
+          duties: string[],
+          technologiesUsed: string[]
+        }[],  
+    }
+    ${prompt}`,}
+  ],
+  // response_format: {"type": "json_object"}
+})
+
+
 export default function CosysoftTemplate() {
   const {
     handleSubmit,
@@ -21,10 +74,11 @@ export default function CosysoftTemplate() {
   } = useForm<Inputs>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const { completion, complete } = useCompletion({
+  const [msg, setMsg] = useState('')
+  const { complete } = useCompletion({
     api: '/api'
   });
-  console.log('completion', completion);
+  console.log('msg', msg);
   
 
   return (
@@ -93,17 +147,71 @@ export default function CosysoftTemplate() {
               formData.append('resume', resume)
             }
             const { data: { message }}: {data: { message: string }} = await axios.post('/api/extract', formData)
-            complete(message)
-            .then((message) => createFile(message ?? '', branded))
-            .then(({ blob, name }) => {
-              saveAs(blob, `${name}.docx`);
-              console.log("Document created successfully");
-              setIsLoading(false)          
+
+            const res = await client.chat.completions.create({
+              model: 'gpt-3.5-turbo',
+              stream: true,
+              messages: [
+                {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+                {"role": "user", "content": `Parse following CV into JSON fitting this schema {
+                  name: string,
+                  position: string,
+                  grade: string | null,
+                  age: number,
+                  experience: string,
+                  location: string,
+                  technologies: string[],
+                  programmingLanguages: string[],
+                  languages: {
+                    level: string,
+                    name: string,
+                  }[],
+                  personalInfo: {
+                    gender: string,
+                    birthday: string,
+                    citizenship: string,
+                    workPermit: string,
+                    relocation: string,
+                    businessTrips: string
+                  },
+                  education: {
+                    level: string,
+                    year: number,
+                    institution: string,
+                    specialization: string
+                  },
+                  certificates: string[],
+                  courses: string[],
+                  projects: {
+                      name: string,
+                      description: string,
+                      duration: string,
+                      role: string,
+                      duties: string[],
+                      technologiesUsed: string[]
+                    }[],  
+                }
+                ${message}`,}
+              ],
+              // response_format: {"type": "json_object"}
             })
-            .catch(e => {
-              setIsLoading(false)
-              setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+
+            const stream = OpenAIStream(res, {
+              onCompletion(completion: string) {
+                setMsg(completion)
+              }
             })
+            // complete(message)
+            // .then((message) => createFile(message ?? '', branded))
+            // .then(({ blob, name }) => {
+            //   saveAs(blob, `${name}.docx`);
+            //   console.log("Document created successfully");
+            //   setIsLoading(false)          
+            // })
+            // .catch(e => {
+            //   setIsLoading(false)
+            //   setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+            // })
           })()
         }}        
       >
