@@ -6,66 +6,16 @@ import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
-import { useCompletion } from "ai/react";
 import { useState } from "react";
-import OpenAI from "openai";
-import { OpenAIStream } from "ai";
+import { createClient } from '@supabase/supabase-js'
 
 export interface Inputs {
   branded: boolean
   resume: File | undefined
 }
-const client = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
 
-const res = async (prompt: string) => await client.chat.completions.create({
-  model: 'gpt-3.5-turbo',
-  stream: true,
-  messages: [
-    {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-    {"role": "user", "content": `Parse following CV into JSON fitting this schema {
-      name: string,
-      position: string,
-      grade: string | null,
-      age: number,
-      experience: string,
-      location: string,
-      technologies: string[],
-      programmingLanguages: string[],
-      languages: {
-        level: string,
-        name: string,
-      }[],
-      personalInfo: {
-        gender: string,
-        birthday: string,
-        citizenship: string,
-        workPermit: string,
-        relocation: string,
-        businessTrips: string
-      },
-      education: {
-        level: string,
-        year: number,
-        institution: string,
-        specialization: string
-      },
-      certificates: string[],
-      courses: string[],
-      projects: {
-          name: string,
-          description: string,
-          duration: string,
-          role: string,
-          duties: string[],
-          technologiesUsed: string[]
-        }[],  
-    }
-    ${prompt}`,}
-  ],
-  // response_format: {"type": "json_object"}
-})
-
-
+// Create a single supabase client for interacting with your database
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 export default function CosysoftTemplate() {
   const {
     handleSubmit,
@@ -73,13 +23,7 @@ export default function CosysoftTemplate() {
     formState: { errors },
   } = useForm<Inputs>()
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [msg, setMsg] = useState('')
-  const { complete } = useCompletion({
-    api: '/api'
-  });
-  console.log('msg', msg);
-  
+  const [error, setError] = useState('')  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -137,81 +81,23 @@ export default function CosysoftTemplate() {
         onClick={() => {
           setIsLoading(true)
           handleSubmit(async ({ resume, branded }) => {
-            let input: ArrayBuffer = new ArrayBuffer(0);
-            if (resume instanceof Blob) {
-              input = await resume.arrayBuffer()
-            }
-
             const formData = new FormData()
             if (resume) {
               formData.append('resume', resume)
             }
-            const { data: { message }}: {data: { message: string }} = await axios.post('/api/extract', formData)
-
-            const res = await client.chat.completions.create({
-              model: 'gpt-3.5-turbo',
-              stream: true,
-              messages: [
-                {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-                {"role": "user", "content": `Parse following CV into JSON fitting this schema {
-                  name: string,
-                  position: string,
-                  grade: string | null,
-                  age: number,
-                  experience: string,
-                  location: string,
-                  technologies: string[],
-                  programmingLanguages: string[],
-                  languages: {
-                    level: string,
-                    name: string,
-                  }[],
-                  personalInfo: {
-                    gender: string,
-                    birthday: string,
-                    citizenship: string,
-                    workPermit: string,
-                    relocation: string,
-                    businessTrips: string
-                  },
-                  education: {
-                    level: string,
-                    year: number,
-                    institution: string,
-                    specialization: string
-                  },
-                  certificates: string[],
-                  courses: string[],
-                  projects: {
-                      name: string,
-                      description: string,
-                      duration: string,
-                      role: string,
-                      duties: string[],
-                      technologiesUsed: string[]
-                    }[],  
-                }
-                ${message}`,}
-              ],
-              // response_format: {"type": "json_object"}
-            })
-
-            const stream = OpenAIStream(res, {
-              onCompletion(completion: string) {
-                setMsg(completion)
-              }
-            })
-            // complete(message)
-            // .then((message) => createFile(message ?? '', branded))
-            // .then(({ blob, name }) => {
-            //   saveAs(blob, `${name}.docx`);
-            //   console.log("Document created successfully");
-            //   setIsLoading(false)          
-            // })
-            // .catch(e => {
-            //   setIsLoading(false)
-            //   setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-            // })
+            const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
+            
+            supabase.functions.invoke('parse-document', { body: { text } })
+              .then(({data: { message }}) => createFile(message ?? '', branded))
+              .then(({ blob, name }) => {
+                saveAs(blob, `${name}.docx`);
+                console.log("Document created successfully");
+                setIsLoading(false)          
+              })
+              .catch(e => {
+                setIsLoading(false)
+                setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+              })
           })()
         }}        
       >
