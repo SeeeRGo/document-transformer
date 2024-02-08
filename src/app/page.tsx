@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
 import { useState } from "react";
 import { createClient } from '@supabase/supabase-js'
+import { slugify } from "transliteration";
 
 export interface Inputs {
   branded: boolean
@@ -98,7 +99,7 @@ export default function CosysoftTemplate() {
                 console.log('name');
                 saveAs(blob, `${name}.docx`);
                 
-                await supabase.storage.from('CV').upload(`A-a.docx`, blob)
+                await supabase.storage.from('CV').upload(`${slugify(name, { separator: '_' })}.docx`, blob)
                 console.log("Document created successfully");
                 setIsLoading(false)          
               })

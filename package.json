@@ -24,7 +24,8 @@
     "openai": "^4.26.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-hook-form": "^7.49.3"
+    "react-hook-form": "^7.49.3",
+    "transliteration": "^2.3.5"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
