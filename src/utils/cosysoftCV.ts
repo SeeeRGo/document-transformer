@@ -341,7 +341,11 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Краткое описание проекта'
                       })
-                    ]
+                    ],
+                    width: {
+                      size: 2500,
+                      type: WidthType.DXA
+                    }
                   }),
                   new TableCell({
                     children: [
@@ -359,7 +363,11 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Срок пребывания на проекте'
                       })
-                    ]
+                    ],
+                    width: {
+                      size: 2500,
+                      type: WidthType.DXA
+                    }
                   }),
                   new TableCell({
                     children: [
@@ -377,7 +385,11 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Роль в проекте'
                       })
-                    ]
+                    ],
+                    width: {
+                      size: 2500,
+                      type: WidthType.DXA
+                    }
                   }),
                   new TableCell({
                     children: [
@@ -400,7 +412,11 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Обязанности / Задачи'
                       })
-                    ]
+                    ],
+                    width: {
+                      size: 2500,
+                      type: WidthType.DXA
+                    }
                   }),
                   new TableCell({
                     children: project?.duties?.map(duty => new Paragraph({
@@ -416,7 +432,11 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Применяемые  технологии'
                       })
-                    ]
+                    ],
+                    width: {
+                      size: 2500,
+                      type: WidthType.DXA
+                    }
                   }),
                   new TableCell({
                     children: [
