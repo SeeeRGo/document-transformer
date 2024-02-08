@@ -27,6 +27,10 @@ Deno.serve(async (req: Request) => {
             experience: string,
             location: string,
             technologies: string[],
+            databases: string[],
+            operatingSystems: string[],
+            webTechnologies: string[],
+            devTools: string[],
             programmingLanguages: string[],
             languages: {
               level: string,

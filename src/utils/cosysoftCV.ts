@@ -1,4 +1,4 @@
-import { AlignmentType, Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { AlignmentType, Document, HeadingLevel, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { CosysoftCV } from './types'
 
@@ -16,6 +16,11 @@ export const createDocument = ({
   location,
   projects,
   languages,
+  databases,
+  webTechnologies,
+  operatingSystems,
+  devTools,
+  certificates
 }: CosysoftCV, branded: boolean): Document => new Document({
   numbering: {
     config: [
@@ -37,134 +42,296 @@ export const createDocument = ({
       ...createHeader(branded),
       children: [
         new Paragraph({
-          children: [new TextRun('ФИО: '), new TextRun({
+          children: [new TextRun({
+            text: 'ФИО: ',
+            size: 40,
+          }), 
+          new TextRun({
             text: name ? `${name}` : '_',
             highlight: name ? undefined : 'red',
-          })]
+            size: 40
+          })],
         }),        
         new Paragraph({
           children: [
-            new TextRun('<Позиция: '), 
+            new TextRun({
+              text: '<Позиция: ',
+              size: 28,
+            }), 
             new TextRun({
               text: position ? `${position}` : '_',
               highlight: position ? undefined : 'red',
+              size: 28,
             }),
-            new TextRun('>')
+            new TextRun({
+              text: '>',
+              size: 28,
+            })
           ]
         }),        
         new Paragraph({
           children: [
-            new TextRun('<Грейд: '), 
+            new TextRun({
+              text: '<Грейд: ',
+              size: 28,
+            }), 
             new TextRun({
               text: grade ?? '_',
               highlight: grade ? undefined : 'red',
+              size: 28
             }),
-            new TextRun('>')
+            new TextRun({
+              text: '>',
+              size: 28,
+            })
           ]
         }),        
         new Paragraph({
           children: [
-            new TextRun('<Возраст: '), 
+            new TextRun({
+              text: '<Возраст: ',
+              size: 28,
+            }), 
             new TextRun({
               text: `${age}` ?? '_',
               highlight: age ? undefined : 'red',
+              size: 28,
             }),
-            new TextRun('>')
+            new TextRun({
+              text: '>',
+              size: 28
+            })
           ]
         }),        
         new Paragraph({
           children: [
-            new TextRun('<Стаж: '), 
+            new TextRun({
+              text: '<Стаж: ',
+              size: 28
+            }), 
             new TextRun({
               text: experience ?? '_',
               highlight: experience ? undefined : 'red',
+              size: 28,
             }),
-            new TextRun('>')
+            new TextRun({
+              text: '>',
+              size: 28,
+            })
           ]
         }),        
         new Paragraph({
           children: [
-            new TextRun('<Локация: '), 
+            new TextRun({
+              text: '<Локация: ',
+              size: 28,
+            }), 
             new TextRun({
               text: location ?? '_',
               highlight: location ? undefined : 'red',
+              size: 28,
             }),
-            new TextRun('>')
+            new TextRun({
+              text: '>',
+              size: 28,
+            })
           ]
-        }),        
+        }), 
+        new Paragraph({ text: '\n\n' }),       
         new Paragraph({
           children: [
-            new TextRun('Технические навыки: '), 
+            new TextRun({
+              text: 'Технические навыки: ',
+              size: 40,
+            }),
+          ]
+        }),
+        new Paragraph({}),         
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'Общие: ',
+              bold: true,
+              size: 22,
+            }), 
             new TextRun({
               text: technologies?.length ? technologies?.join(', ') : '_',
               highlight: technologies?.length ? undefined : 'red',
+              size: 22,
             }),
           ]
-        }),        
+        }),         
         new Paragraph({
           children: [
-            new TextRun('Языки программирования: '), 
             new TextRun({
-              text: programmingLanguages.length ? programmingLanguages?.join(', ') : '_',
+              text: 'Языки программирования: ',
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: programmingLanguages?.length ? programmingLanguages?.join(', ') : '_',
               highlight: programmingLanguages?.length ? undefined : 'red',
+              size: 22,
             }),
           ]
         }),
         new Paragraph({
-          text: `Операционные системы: `
-        }),
-        new Paragraph({
-          text: `Веб технологии: `
-        }),
-        new Paragraph({
-          text: `Базы данных: `
-        }),
-        new Paragraph({
-          text: `Инструменты разработки: `
-        }),
-        new Paragraph({
-          text: `Личная информация`
-        }),
-        new Paragraph({
-          text: personalInfo.gender
+          children: [
+            new TextRun({
+              text: `Операционные системы: `,
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: operatingSystems?.length ? operatingSystems?.join(', ') : '_',
+              highlight: operatingSystems?.length ? undefined : 'red',
+              size: 22,
+            }),
+          ]
         }),
         new Paragraph({
           children: [
-            new TextRun('Иностранные языки: '),
+            new TextRun({
+              text: `Веб технологии: `,
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: webTechnologies?.length ? webTechnologies?.join(', ') : '_',
+              highlight: webTechnologies?.length ? undefined : 'red',
+              size: 22,
+            }),
+          ]
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Базы данных: `,
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: databases?.length ? databases?.join(', ') : '_',
+              highlight: databases?.length ? undefined : 'red',
+              size: 22,
+            }),
+          ]
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Инструменты разработки: `,
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: devTools?.length ? devTools?.join(', ') : '_',
+              highlight: devTools?.length ? undefined : 'red',
+              size: 22,
+            }),
+          ]
+        }),
+        new Paragraph({
+          text: `\n`,
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Личная информация: `,
+              size: 40,
+            }),
+          ],
+        }),
+        new Paragraph({
+          text: `\n`,
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'Иностранные языки: ',
+              bold: true,
+              size: 22,
+            }),
           ],
         }),
         ...languages?.length 
-          ? languages?.flatMap(language => new Paragraph({ text: `${language.name} ${language.level}`}))
+          ? languages?.flatMap(language => new Paragraph({ children: [
+            new TextRun({
+              text: `${language.name} ${language.level}`,
+              size: 22,
+            })
+          ],
+        }))
           : [new Paragraph({children: [
               new TextRun({
                 text: '_',
                 highlight:'red',
+                size: 22,
               }),
             ]})],
         new Paragraph({
           children: [
             new TextRun({
-              text: education && (Object.keys(education)).length ? `Образование: ${education.level}, ${education.institution}, ${education.specialization}, ${education.year}` : '_',
+              text: 'Образование: ',
+              size: 22,
+              bold: true,
+            }),
+            new TextRun({
+              text: education && (Object.keys(education)).length ? `${education.level}, ${education.institution}, ${education.specialization}, ${education.year}` : '_',
               highlight: education && (Object.keys(education)).length ? undefined : 'red',
+              size: 22,
             })
           ],
         }),
         new Paragraph({
-          children: [new TextRun('Курсы: '), new TextRun({
+          children: [
+            new TextRun({
+              text: 'Курсы: ',
+              bold: true,
+              size: 22,
+            }), 
+          new TextRun({
             text: courses?.length ? courses?.join(', ') : '_',
             highlight: courses?.length ? undefined : 'red',
-          })],
+            size: 22,
+          })
+        ],
         }),
         new Paragraph({
-          text: `Сертификаты:`
+          children: [
+            new TextRun({
+              text: `Сертификаты: `,
+              bold: true,
+              size: 22,
+            }), 
+            new TextRun({
+              text: certificates?.length ? certificates?.join(', ') : '_',
+              highlight: certificates?.length ? undefined : 'red',
+              size: 22,
+
+            }),
+          ]
         }),
         new Paragraph({
-          text: `Проекты:`
+          children: [
+            new TextRun({
+              text: `Проекты: `,
+              size: 40,
+            }),
+          ],
         }),
+        new Paragraph({}),
         ...projects.flatMap(project => [
           new Paragraph({
-            text: `Наименование проекта: ${project?.name}`
+            children: [
+              new TextRun({
+                text: `Наименование проекта: ${project?.name}`,
+                size: 22,
+                bold: true,
+              }),
+            ],
           }),
+          new Paragraph({}),
           new Table({
             rows: [
               new TableRow({
@@ -265,7 +432,8 @@ export const createDocument = ({
               size: 10000,
               type: WidthType.DXA
             }
-          })
+          }),
+          new Paragraph({}),
         ]),
       ]
     }

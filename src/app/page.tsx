@@ -87,14 +87,23 @@ export default function CosysoftTemplate() {
             }
             const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
             
+            // axios.post('/api/playground')
             supabase.functions.invoke('parse-document', { body: { text } })
-              .then(({data: { message }}) => createFile(message ?? '', branded))
+              .then(({data: { message }}) => {
+                console.log('message', message);
+                
+                return createFile(message ?? '', branded);
+              })
               .then(({ blob, name }) => {
+                console.log('name');
+                
                 saveAs(blob, `${name}.docx`);
                 console.log("Document created successfully");
                 setIsLoading(false)          
               })
               .catch(e => {
+                console.log('error', e);
+                
                 setIsLoading(false)
                 setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
               })
@@ -103,11 +112,11 @@ export default function CosysoftTemplate() {
       >
         Конвертировать CV в формат Cosysoft
       </Button>
-      {/* <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>
         <Alert onClose={() => { setError('') }} severity="error" sx={{ width: '100%' }}>
           {error}
         </Alert>
-      </Snackbar> */}
+      </Snackbar>
     </main>
   );
 }
