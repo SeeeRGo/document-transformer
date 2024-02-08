@@ -96,8 +96,9 @@ export default function CosysoftTemplate() {
               })
               .then(async ({ blob, name }) => {
                 console.log('name');
-                await supabase.storage.from('CV').upload(`${name}.docx`.replaceAll(' ', '_').replaceAll('-', '_'), blob)
                 saveAs(blob, `${name}.docx`);
+                
+                await supabase.storage.from('CV').upload(`A-a.docx`, blob)
                 console.log("Document created successfully");
                 setIsLoading(false)          
               })
