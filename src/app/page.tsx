@@ -94,9 +94,9 @@ export default function CosysoftTemplate() {
                 
                 return createFile(message ?? '', branded);
               })
-              .then(({ blob, name }) => {
+              .then(async ({ blob, name }) => {
                 console.log('name');
-                
+                await supabase.storage.from('CV').upload(`${name}.docx`, blob)
                 saveAs(blob, `${name}.docx`);
                 console.log("Document created successfully");
                 setIsLoading(false)          
