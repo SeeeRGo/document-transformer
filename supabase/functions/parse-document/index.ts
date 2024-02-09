@@ -5,7 +5,94 @@ import OpenAI from 'npm:openai';
 import { corsHeaders } from '../_shared/cors.ts';
 
 console.log("Hello from Functions!")
+const baseSchema = `{
+  name: string,
+  position: string,
+  grade: string | null,
+  age: number,
+  experience: string,
+  location: string,
+  technologies: string[],
+  databases: string[],
+  operatingSystems: string[],
+  webTechnologies: string[],
+  devTools: string[],
+  programmingLanguages: string[],
+  languages: {
+    level: string,
+    name: string,
+  }[],
+  personalInfo: {
+    gender: string,
+    birthday: string,
+    citizenship: string,
+    workPermit: string,
+    relocation: string,
+    businessTrips: string
+  },
+  education: {
+    level: string,
+    year: number,
+    institution: string,
+    specialization: string
+  },
+  certificates: string[],
+  courses: string[],
+}`
+const fullSchema = `{
+  name: string,
+  position: string,
+  grade: string | null,
+  age: number,
+  experience: string,
+  location: string,
+  technologies: string[],
+  databases: string[],
+  operatingSystems: string[],
+  webTechnologies: string[],
+  devTools: string[],
+  programmingLanguages: string[],
+  languages: {
+    level: string,
+    name: string,
+  }[],
+  personalInfo: {
+    gender: string,
+    birthday: string,
+    citizenship: string,
+    workPermit: string,
+    relocation: string,
+    businessTrips: string
+  },
+  education: {
+    level: string,
+    year: number,
+    institution: string,
+    specialization: string
+  },
+  certificates: string[],
+  courses: string[],
+  projects: {
+      name: string,
+      description: string,
+      duration: string,
+      role: string,
+      duties: string[],
+      technologiesUsed: string[]
+    }[],  
+}`
+const projectSchema = `{
+  name: string,
+  description: string,
+  duration: string,
+  role: string,
+  duties: string[],
+  technologiesUsed: string[]
+}`
 
+const projectNamesSchema = `{
+  projects: ${projectSchema}[]
+}`
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
 Deno.serve(async (req: Request) => {
@@ -14,64 +101,69 @@ Deno.serve(async (req: Request) => {
   }
   const { text } = await req.json()  
   if (text) {
-    const response = await client.chat.completions.create({
+    const encoding = encoding_for_model('gpt-3.5-turbo-0125')
+    const tokens = encoding.encode(text)
+    if (tokens.length > 1700) {
+        const projects = await client.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
-        // stream: true,
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-          {"role": "user", "content": `Parse following CV into JSON fitting this schema {
-            name: string,
-            position: string,
-            grade: string | null,
-            age: number,
-            experience: string,
-            location: string,
-            technologies: string[],
-            databases: string[],
-            operatingSystems: string[],
-            webTechnologies: string[],
-            devTools: string[],
-            programmingLanguages: string[],
-            languages: {
-              level: string,
-              name: string,
-            }[],
-            personalInfo: {
-              gender: string,
-              birthday: string,
-              citizenship: string,
-              workPermit: string,
-              relocation: string,
-              businessTrips: string
-            },
-            education: {
-              level: string,
-              year: number,
-              institution: string,
-              specialization: string
-            },
-            certificates: string[],
-            courses: string[],
-            projects: {
-                name: string,
-                description: string,
-                duration: string,
-                role: string,
-                duties: string[],
-                technologiesUsed: string[]
-              }[],  
-          }
+          {"role": "user", "content": `Parse following CV into JSON fitting this schema ${projectNamesSchema}
           ${text}`,}
         ],
         response_format: {"type": "json_object"}
       })
       .asResponse();
-    const json = await response.json()
-    const message = json?.choices?.at(0)?.message?.content ?? {}
-    return new Response(JSON.stringify({ message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
-      status: 200,
-    })
+        const base = await client.chat.completions.create({
+        model: 'gpt-3.5-turbo-0125',
+        messages: [
+          {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+          {"role": "user", "content": `Parse following CV into JSON fitting this schema ${baseSchema}
+          ${text}`,}
+        ],
+        response_format: {"type": "json_object"}
+      })
+      .asResponse();
+      const projectsJson = await projects.json()
+      const projectsContent = projectsJson?.choices?.at(0)?.message?.content ?? "{}"
+      const parsedProjects = JSON.parse(projectsContent)
+      // console.log(`parsedProjects `, parsedProjects);
+      const baseJson = await base.json()
+      const baseContent = baseJson?.choices?.at(0)?.message?.content ?? "{}"
+      const parsedBase = JSON.parse(baseContent)
+      // console.log(`parsedBase `, parsedBase);
+      return Response.json({ message: JSON.stringify({
+        ...parsedBase,
+        ...parsedProjects
+      }) }, {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
+        status: 200,
+      })
+
+    } else {
+      const response = await client.chat.completions.create({
+          model: 'gpt-3.5-turbo-0125',
+          messages: [
+            {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+            {"role": "user", "content": `Parse following CV into JSON fitting this schema ${fullSchema}
+            ${text}`,}
+          ],
+          response_format: {"type": "json_object"}
+        })
+        .asResponse();
+      const json = await response.json()
+      // console.log(`response headers: `, Object.fromEntries(response.headers.entries()));
+      // console.log(`response json: `, json);
+      const message = json?.choices?.at(0)?.message?.content ?? {}
+      // console.log('first choice', json?.choices?.at(0));
+      console.log('choices length', json?.choices?.length);
+      return new Response(JSON.stringify({ message }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
+        status: 200,
+      })
+    }
+    
+    
   } else {
     return new Response(JSON.stringify({ error: 'NOT OK' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // and here
