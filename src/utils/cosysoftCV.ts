@@ -342,17 +342,14 @@ export const createDocument = ({
                         text: 'Краткое описание проекта'
                       })
                     ],
-                    width: {
-                      size: 2500,
-                      type: WidthType.DXA
-                    }
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({
                         text: project?.description ?? ''
                       })
-                    ]
+                    ],
+                    columnSpan: 3
                   }),
                 ],
               }),
@@ -363,18 +360,15 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Срок пребывания на проекте'
                       })
-                    ],
-                    width: {
-                      size: 2500,
-                      type: WidthType.DXA
-                    }
+                    ]
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({
                         text: project?.duration ?? ''
                       })
-                    ]
+                    ],
+                    columnSpan: 3
                   }),
                 ],
               }),
@@ -385,11 +379,7 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Роль в проекте'
                       })
-                    ],
-                    width: {
-                      size: 2500,
-                      type: WidthType.DXA
-                    }
+                    ]
                   }),
                   new TableCell({
                     children: [
@@ -399,9 +389,10 @@ export const createDocument = ({
                             text: project?.role ?? '_',
                             highlight: project?.role ? undefined : 'red',
                           })
-                        ]
+                        ],
                       })
-                    ]
+                    ],
+                    columnSpan: 3
                   }),
                 ],
               }),
@@ -412,11 +403,7 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Обязанности / Задачи'
                       })
-                    ],
-                    width: {
-                      size: 2500,
-                      type: WidthType.DXA
-                    }
+                    ]
                   }),
                   new TableCell({
                     children: project?.duties?.map(duty => new Paragraph({
@@ -432,18 +419,15 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Применяемые  технологии'
                       })
-                    ],
-                    width: {
-                      size: 2500,
-                      type: WidthType.DXA
-                    }
+                    ]
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({
                         text: project?.technologiesUsed?.join(', ') ?? ''
                       })
-                    ]
+                    ],
+                    columnSpan: 3
                   }),
                 ],
               }),
