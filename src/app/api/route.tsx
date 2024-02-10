@@ -108,12 +108,21 @@ export async function POST(request: NextRequest) {
     const encoding = encoding_for_model('gpt-3.5-turbo-0125')
     const tokens = encoding.encode(text)
     if (tokens.length > 1700) {
+      const projectsSummary = await client.chat.completions.create({
+        model: 'gpt-3.5-turbo-0125',
+        messages: [
+          {"role": "system", "content": "You are a helpful assistant carefully working with CVs"},
+          {"role": "user", "content": `Get me information about work experience from this CV 
+          ${text}`,}
+        ],
+      })
+      const summaryContent = projectsSummary.choices?.at(0)?.message?.content ?? ''
         const projects = await client.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
           {"role": "user", "content": `Parse following CV into JSON fitting this schema ${projectNamesSchema}
-          ${text}`,}
+          ${summaryContent}`,}
         ],
         response_format: {"type": "json_object"}
       })

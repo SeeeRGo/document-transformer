@@ -3,6 +3,8 @@
 // This enables autocomplete, go to definition, etc.
 import OpenAI from 'npm:openai';
 import { corsHeaders } from '../_shared/cors.ts';
+import { encodingForModel } from 'npm:js-tiktoken'
+
 
 console.log("Hello from Functions!")
 const baseSchema = `{
@@ -96,20 +98,34 @@ const projectNamesSchema = `{
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
 Deno.serve(async (req: Request) => {
+  console.log('req.method', req.method);
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
   const { text } = await req.json()  
   if (text) {
-    const encoding = encoding_for_model('gpt-3.5-turbo-0125')
+    const encoding = encodingForModel('gpt-3.5-turbo-0125')
     const tokens = encoding.encode(text)
     if (tokens.length > 1700) {
+      let projectsText = text
+      if (tokens.length > 2800) {
+        const projectsSummary = await client.chat.completions.create({
+          model: 'gpt-3.5-turbo-0125',
+          messages: [
+            {"role": "system", "content": "You are a helpful assistant carefully working with CVs"},
+            {"role": "user", "content": `Get me information about work experience from this CV 
+            ${text}`,}
+          ],
+        })
+        projectsText = projectsSummary.choices?.at(0)?.message?.content ?? ''
+      }
         const projects = await client.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
           {"role": "user", "content": `Parse following CV into JSON fitting this schema ${projectNamesSchema}
-          ${text}`,}
+          ${projectsText}`,}
         ],
         response_format: {"type": "json_object"}
       })
@@ -132,10 +148,10 @@ Deno.serve(async (req: Request) => {
       const baseContent = baseJson?.choices?.at(0)?.message?.content ?? "{}"
       const parsedBase = JSON.parse(baseContent)
       // console.log(`parsedBase `, parsedBase);
-      return Response.json({ message: JSON.stringify({
+      return new Response(JSON.stringify({ message: JSON.stringify({
         ...parsedBase,
         ...parsedProjects
-      }) }, {
+      }) }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
         status: 200,
       })
