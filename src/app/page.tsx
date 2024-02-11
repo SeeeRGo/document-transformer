@@ -16,6 +16,9 @@ export interface Inputs {
   resume: File | undefined
 }
 
+const bucketName = 'CV'
+const tableName = 'processed_files'
+
 // Create a single supabase client for interacting with your database
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 export default function CosysoftTemplate() {
@@ -94,26 +97,50 @@ export default function CosysoftTemplate() {
             setIsLoading(true)
             handleSubmit(async ({ resume, branded }) => {
               const formData = new FormData()
-              const currentTime = dayjs().toISOString()
+              const currentTime = dayjs().toISOString() // TODO make folders by day
+              const currentDay = dayjs().format('DD-MM-YYYY')
+              const originalName = `${currentDay}/${currentTime}-original.docx`
+              const processedName = `${currentDay}/${currentTime}-processed.docx`
+              let originalLink = ''
               if (resume) {
                 formData.append('resume', resume)
-                const { data: original } = await supabase.storage.from('CV').upload(`${currentTime}-original.docx`, resume)
-                console.log("original", original);
+                await supabase.storage.from(bucketName).upload(originalName, resume)
+                const { data: { publicUrl } } = supabase
+                  .storage
+                  .from(bucketName)
+                  .getPublicUrl(originalName, {
+                    download: true,
+                  })
+                originalLink = publicUrl
               }
               const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
               // axios.post('/api', formData)
 
               supabase.functions.invoke('parse-document', { body: { text } })
-                .then(({data: { message }}) => {
-                  console.log('message', message);
-                  
-                  return createFile(message ?? '', branded);
+                .then(async ({data: { message, length }}) => {    
+                  const file = await createFile(message ?? '', branded)
+                  return {
+                    ...file,
+                    length,
+                  }
                 })
-                .then(async ({ blob, name }) => {
+                .then(async ({ blob, name, length }) => {
                   saveAs(blob, `${name}.docx`);
-                  const { data: processed } = await supabase.storage.from('CV').upload(`${currentTime}-processed.docx`, blob)
-                  console.log("processed", processed);
+                  await supabase.storage.from(bucketName).upload(processedName, blob)
+                  const { data: { publicUrl: processedLink } } = supabase
+                    .storage
+                    .from(bucketName)
+                    .getPublicUrl(processedName, {
+                      download: true,
+                    })
+                    
+                  await supabase.from(tableName).insert({
+                    original_url: originalLink,
+                    processed_url: processedLink,
+                    token_length: length,
+                    name,
+                  })
                   setIsLoading(false)          
                 })
                 .catch(e => {

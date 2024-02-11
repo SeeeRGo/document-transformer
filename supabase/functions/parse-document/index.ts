@@ -151,7 +151,9 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ message: JSON.stringify({
         ...parsedBase,
         ...parsedProjects
-      }) }), {
+      }),
+      length: tokens.length
+     }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
         status: 200,
       })
@@ -173,7 +175,7 @@ Deno.serve(async (req: Request) => {
       const message = json?.choices?.at(0)?.message?.content ?? {}
       // console.log('first choice', json?.choices?.at(0));
       console.log('choices length', json?.choices?.length);
-      return new Response(JSON.stringify({ message }), {
+      return new Response(JSON.stringify({ message, length: tokens.length }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
         status: 200,
       })
