@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
 import { useState } from "react";
 import { createClient } from '@supabase/supabase-js'
-import { slugify } from "transliteration";
+import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
 
 export interface Inputs {
@@ -94,12 +94,16 @@ export default function CosysoftTemplate() {
             setIsLoading(true)
             handleSubmit(async ({ resume, branded }) => {
               const formData = new FormData()
+              const currentTime = dayjs().toISOString()
               if (resume) {
                 formData.append('resume', resume)
+                const { data: original } = await supabase.storage.from('CV').upload(`${currentTime}-original.docx`, resume)
+                console.log("original", original);
               }
               const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
               // axios.post('/api', formData)
+
               supabase.functions.invoke('parse-document', { body: { text } })
                 .then(({data: { message }}) => {
                   console.log('message', message);
@@ -107,11 +111,9 @@ export default function CosysoftTemplate() {
                   return createFile(message ?? '', branded);
                 })
                 .then(async ({ blob, name }) => {
-                  console.log('name');
                   saveAs(blob, `${name}.docx`);
-                  
-                  await supabase.storage.from('CV').upload(`${slugify(name, { separator: '_' })}.docx`, blob)
-                  console.log("Document created successfully");
+                  const { data: processed } = await supabase.storage.from('CV').upload(`${currentTime}-processed.docx`, blob)
+                  console.log("processed", processed);
                   setIsLoading(false)          
                 })
                 .catch(e => {
