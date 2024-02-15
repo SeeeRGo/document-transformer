@@ -113,7 +113,7 @@ Deno.serve(async (req: Request) => {
         const projectsSummary = await client.chat.completions.create({
           model: 'gpt-3.5-turbo-0125',
           messages: [
-            {"role": "system", "content": "You are a helpful assistant carefully working with CVs"},
+            {"role": "system", "content": "You are a helpful assistant carefully extracting information about work experience from CVs"},
             {"role": "user", "content": `Get me information about work experience from this CV in Russian
             ${text}`,}
           ],
