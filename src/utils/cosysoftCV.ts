@@ -342,7 +342,7 @@ export const createDocument = ({
                         text: 'Краткое описание проекта'
                       })
                     ],
-                    width: { size: '35mm' },
+                    width: { size: 2500, type: WidthType.DXA },
                   }),
                   new TableCell({
                     children: [
@@ -350,7 +350,7 @@ export const createDocument = ({
                         text: project?.description ?? ''
                       })
                     ],
-                    width: { size:`115mm` },
+                    width: { size: 7500, type: WidthType.DXA },
                   }),
                 ],
               }),
@@ -362,7 +362,7 @@ export const createDocument = ({
                         text: 'Срок пребывания на проекте'
                       })
                     ],
-                    width: { size: '35mm' },
+                    width: { size: 2500, type: WidthType.DXA },
                   }),
                   new TableCell({
                     children: [
@@ -370,7 +370,7 @@ export const createDocument = ({
                         text: project?.duration ?? ''
                       })
                     ],
-                    width: { size:`115mm` },
+                    width: { size: 7500, type: WidthType.DXA },
                   }),
                 ],
               }),
@@ -382,7 +382,7 @@ export const createDocument = ({
                         text: 'Роль в проекте'
                       })
                     ],
-                    width: { size: '35mm' },
+                    width: { size: 2500, type: WidthType.DXA },
                   }),
                   new TableCell({
                     children: [
@@ -395,7 +395,7 @@ export const createDocument = ({
                         ],
                       })
                     ],
-                    width: { size:`115mm` },
+                    width: { size: 7500, type: WidthType.DXA },
                   }),
                 ],
               }),
@@ -407,14 +407,14 @@ export const createDocument = ({
                         text: 'Обязанности / Задачи'
                       })
                     ],
-                    width: { size: '35mm' },
+                    width: { size: 2500, type: WidthType.DXA },
 
                   }),
                   new TableCell({
                     children: project?.duties?.map(duty => new Paragraph({
                       text: ` -   ${duty}`,
                     })) ?? [],
-                    width: { size:`115mm` },
+                    width: { size: 7500, type: WidthType.DXA },
                   }),
                 ],
               }),
@@ -426,7 +426,7 @@ export const createDocument = ({
                         text: 'Применяемые  технологии'
                       })
                     ],
-                    width: { size: '35mm' },
+                    width: { size: 2500, type: WidthType.DXA },
                   }),
                   new TableCell({
                     children: [
@@ -434,13 +434,14 @@ export const createDocument = ({
                         text: project?.technologiesUsed?.join(', ') ?? ''
                       })
                     ],
-                    width: { size:`115mm` },
+                    width: { size: 7500, type: WidthType.DXA },
                   }),
                 ],
               }),
             ],
             width: {
-              size: `150mm`,
+              size: 10000,
+              type: WidthType.DXA
             }
           }),
           new Paragraph({}),
