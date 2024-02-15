@@ -119,6 +119,8 @@ Deno.serve(async (req: Request) => {
           ],
         })
         projectsText = projectsSummary.choices?.at(0)?.message?.content ?? ''
+        console.log('projects text', projectsText);
+        
       }
         const projects = await client.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
