@@ -333,6 +333,7 @@ export const createDocument = ({
           }),
           new Paragraph({}),
           new Table({
+            columnWidths: [2500, 7500],
             rows: [
               new TableRow({
                 children: [
@@ -439,10 +440,6 @@ export const createDocument = ({
                 ],
               }),
             ],
-            width: {
-              size: 10000,
-              type: WidthType.DXA
-            }
           }),
           new Paragraph({}),
         ]),
