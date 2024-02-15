@@ -342,6 +342,7 @@ export const createDocument = ({
                         text: 'Краткое описание проекта'
                       })
                     ],
+                    width: { size: 25, type: WidthType.PERCENTAGE },
                   }),
                   new TableCell({
                     children: [
@@ -349,7 +350,7 @@ export const createDocument = ({
                         text: project?.description ?? ''
                       })
                     ],
-                    columnSpan: 3
+                    width: { size: 75, type: WidthType.PERCENTAGE },
                   }),
                 ],
               }),
@@ -360,7 +361,8 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Срок пребывания на проекте'
                       })
-                    ]
+                    ],
+                    width: { size: 25, type: WidthType.PERCENTAGE },
                   }),
                   new TableCell({
                     children: [
@@ -368,7 +370,7 @@ export const createDocument = ({
                         text: project?.duration ?? ''
                       })
                     ],
-                    columnSpan: 3
+                    width: { size: 75, type: WidthType.PERCENTAGE },
                   }),
                 ],
               }),
@@ -379,7 +381,8 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Роль в проекте'
                       })
-                    ]
+                    ],
+                    width: { size: 25, type: WidthType.PERCENTAGE },
                   }),
                   new TableCell({
                     children: [
@@ -392,7 +395,7 @@ export const createDocument = ({
                         ],
                       })
                     ],
-                    columnSpan: 3
+                    width: { size: 75, type: WidthType.PERCENTAGE },
                   }),
                 ],
               }),
@@ -403,7 +406,9 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Обязанности / Задачи'
                       })
-                    ]
+                    ],
+                    width: { size: 25, type: WidthType.PERCENTAGE },
+
                   }),
                   new TableCell({
                     children: project?.duties?.map(duty => new Paragraph({
@@ -419,7 +424,8 @@ export const createDocument = ({
                       new Paragraph({
                         text: 'Применяемые  технологии'
                       })
-                    ]
+                    ],
+                    width: { size: 25, type: WidthType.PERCENTAGE },
                   }),
                   new TableCell({
                     children: [
@@ -427,14 +433,14 @@ export const createDocument = ({
                         text: project?.technologiesUsed?.join(', ') ?? ''
                       })
                     ],
-                    columnSpan: 3
+                    width: { size: 75, type: WidthType.PERCENTAGE },
                   }),
                 ],
               }),
             ],
             width: {
-              size: 10000,
-              type: WidthType.DXA
+              size: 100,
+              type: WidthType.PERCENTAGE
             }
           }),
           new Paragraph({}),

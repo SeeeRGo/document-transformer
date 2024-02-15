@@ -114,7 +114,7 @@ Deno.serve(async (req: Request) => {
           model: 'gpt-3.5-turbo-0125',
           messages: [
             {"role": "system", "content": "You are a helpful assistant carefully working with CVs"},
-            {"role": "user", "content": `Get me information about work experience from this CV 
+            {"role": "user", "content": `Get me information about work experience from this CV in Russian
             ${text}`,}
           ],
         })
