@@ -10,14 +10,80 @@ import { useState } from "react";
 import { createClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
+import Editor from "@/components/editor";
+import { Document, Packer, Paragraph, TextRun } from "docx";
 
 export interface Inputs {
   branded: boolean
   resume: File | undefined
 }
 
+const parsedJsonMock = {
+  name: "Фамилий Имён Отчествович"
+}
+
 const bucketName = 'CV'
 const tableName = 'processed_files'
+
+const simplestTemplate = [
+  {
+    type: 'string',
+    children: [
+      {
+        type: 'text',
+        value: 'ФИО: '
+      },
+      {
+        type: 'variable',
+        path: 'name',
+      }
+    ],
+    params: {
+      size: 40
+    }
+  },
+  // {
+  //   type: 'string[]'
+  // },
+  // {
+  //   type: 'object'
+  // },
+  // {
+  //   type: 'object[]'
+  // }
+]
+
+const createTextRun = (source: any, t: any, params: any) => t.type === 'text' ? new TextRun({
+  text: t.value,
+  ...params,
+}) : new TextRun({
+  text: source[t.path] ? source[t.path] : '_',
+  highlight: source[t.path] ? undefined : 'red',
+  ...params,
+})
+const createDocxSection = (source: any, temp: any[], params: any) => new Paragraph({
+  children: temp.map(t => createTextRun(source, t, params)),
+})
+const createDocxFromTemplate = (sourceJson: any, template: any[]) => new Document({
+  sections: [
+    {
+      children: template.map(block => createDocxSection(sourceJson, block.children, block.params)),
+    },
+  ]
+})
+const createEditorJsText = (source: any, temp: any[]) => temp.reduce((acc, t) => `${acc}${t.type === 'text' ? t.value : source[t.path] ? source[t.path] : '_'}`,'')
+const createEditorJsFromTemplate = (sourceJson: any, template: any[]) => ({
+  time: new Date().getTime(),
+  blocks: template.map(block => ({
+    type: "header",
+    data: {
+      text: createEditorJsText(sourceJson, block.children),
+      level: 1
+    }
+  }))
+})
+
+const INITIAL_DATA = createEditorJsFromTemplate(parsedJsonMock, simplestTemplate);
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
@@ -31,7 +97,9 @@ export default function CosysoftTemplate() {
   } = useForm<Inputs>()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')  
-  const fileName = watch('resume')  
+  const fileName = watch('resume')
+  const [data, setData] = useState(INITIAL_DATA);
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -153,6 +221,21 @@ export default function CosysoftTemplate() {
           }}        
         >
           Конвертировать CV в формат Cosysoft
+        </Button>
+        <Editor data={data} onChange={setData} editorblock="editorjs-container" />
+        <Button
+        className="savebtn"
+        onClick={() => {
+          alert(JSON.stringify(data));
+        }}
+        >
+          Save
+        </Button>
+        <Button onClick={async () => {
+            const blob = await Packer.toBlob(createDocxFromTemplate(parsedJsonMock, simplestTemplate))
+            saveAs(blob, `fromTemplate.docx`);
+        }}>
+          Download Templated Result
         </Button>
       </>
     )

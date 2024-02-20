@@ -22,21 +22,6 @@ export const createDocument = ({
   devTools,
   certificates
 }: CosysoftCV, branded: boolean): Document => new Document({
-  numbering: {
-    config: [
-        {
-          reference: "bullets",
-          levels: [
-            {
-              level: 0,
-              format: "bullet",
-              text: "%1.",
-              alignment: AlignmentType.START,
-            },
-          ],
-        },
-    ],
-},
   sections: [
     {
       ...createHeader(branded),
