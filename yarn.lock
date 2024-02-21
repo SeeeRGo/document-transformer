@@ -3447,6 +3447,11 @@ streamsearch@^1.1.0:
   resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-1.1.0.tgz#404dd1e2247ca94af554e841a8ef0eaa238da764"
   integrity sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==
 
+string-template-parser@^1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/string-template-parser/-/string-template-parser-1.2.6.tgz#0a8034f4b728789cd5034f74882001196787abe3"
+  integrity sha512-GsSNOkzaupvBRDKtO8j7limAd0DStJUHy+iQ0rBVaPJO9Jt+lfCVN0eJJEqqr/oBtZ5t29QhVTo9HREAdY1YxQ==
+
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"

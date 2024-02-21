@@ -103,11 +103,11 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-  const { text } = await req.json()  
+  const { text, schema } = await req.json()  
   if (text) {
     const encoding = encodingForModel('gpt-3.5-turbo-0125')
     const tokens = encoding.encode(text)
-    if (tokens.length > 1700) {
+    if (tokens.length > 1700 && !schema) {
       let projectsText = text
       if (tokens.length > 2800) {
         const projectsSummary = await client.chat.completions.create({
@@ -165,7 +165,7 @@ Deno.serve(async (req: Request) => {
           model: 'gpt-3.5-turbo-0125',
           messages: [
             {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-            {"role": "user", "content": `Parse following CV into JSON fitting this schema ${fullSchema}
+            {"role": "user", "content": `Parse following CV into JSON fitting this schema ${schema}
             ${text}`,}
           ],
           response_format: {"type": "json_object"}
