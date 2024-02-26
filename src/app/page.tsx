@@ -13,7 +13,7 @@ import { CloseOutlined } from "@mui/icons-material";
 import Editor from "@/components/editor";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
-export interface Inputs {
+interface Inputs {
   branded: boolean
   resume: File | undefined
 }
@@ -55,22 +55,12 @@ const createEditorJsText = (source: any, temp: any[]) => temp.reduce((acc, t) =>
 const createEditorJsFromTemplate = (sourceJson: any, template: any[]) => ({
   time: new Date().getTime(),
   blocks: template.map(block => ({
-    type: "header",
+    type: "paragraph",
     data: {
       text: createEditorJsText(sourceJson, block.children),
       level: 1,
     }
   }))
-})
-
-const createDocxFromEditorJsData = (data: any) => new Document({
-  sections: [
-    {
-      children: data.blocks.map((block: any) => new Paragraph({
-        text: block.data.text
-      }))
-    }
-  ]
 })
 
 const INITIAL_DATA = createEditorJsFromTemplate(parsedJsonMock, simplestTemplate);

@@ -1,31 +1,14 @@
 //@ts-nocheck
 "use client"
 import React, { memo, useEffect, useRef } from "react";
-import dynamic from 'next/dynamic';
-const EditorJS = dynamic(() => import('@editorjs/editorjs'), {
-  ssr: false
-});
-const Paragraph = dynamic(() => import('@editorjs/paragraph'), {
-  ssr: false
-});
-const Header = dynamic(() => import('@editorjs/header'), {
-  ssr: false
-});
-const List = dynamic(() => import('@editorjs/list'), {
-  ssr: false
-});
-const Link = dynamic(() => import('@editorjs/link'), {
-  ssr: false
-});
-const Delimiter = dynamic(() => import('@editorjs/delimiter'), {
-  ssr: false
-});
-const CheckList = dynamic(() => import('@editorjs/checklist'), {
-  ssr: false
-});
-const Table = dynamic(() => import('@editorjs/table'), {
-  ssr: false
-});
+import EditorJS from "@editorjs/editorjs";
+import Paragraph from '@editorjs/paragraph'
+import Header from '@editorjs/header'
+import List from '@editorjs/list'
+import Link from '@editorjs/link'
+import Delimiter from '@editorjs/delimiter'
+import CheckList from '@editorjs/checklist'
+import Table from '@editorjs/table'
 
 export const EDITOR_JS_TOOLS = {
   paragraph: {
@@ -46,6 +29,8 @@ const Editor = ({ data, onChange, editorblock }: any) => {
   useEffect(() => {
     //Initialize editorjs if we don't have a reference
     if (!ref.current) {
+      console.log('data', data);
+      
       const editor = new EditorJS({
         holder: editorblock,
 

@@ -1,26 +1,33 @@
 "use client"
-import Editor from "@/components/editor";
+// import Editor from "";
 import { useEffect, useState } from "react";
 import { parseStringTemplate } from 'string-template-parser';
 import { saveAs } from "file-saver";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
-import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, Modal, Snackbar, Stack, Typography } from "@mui/material"
+import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, Modal, Snackbar, Stack, TextField, Typography } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
 import { createFile } from "@/utils/createFile";
 import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
-import { Inputs } from "../page";
-import { Packer } from "docx";
+import { Document, Packer, Paragraph } from "docx";
 import { createDocxFromTemplate } from "@/utils/docxUtils";
+import dynamic from "next/dynamic";
+const Editor = dynamic(() => import("../../components/editor"), {
+  ssr: false,
+});
 const bucketName = 'CV_test'
 const tableName = 'processed_files_test'
 
 const parsedJsonMock = {
   name: "Челик",
   age: '32' // Solve issues with numbers
+}
+
+interface Inputs {
+  resume: File | undefined
 }
 const createTemplateFromEditorJs = (data: any) => {
   return data.blocks.reduce((acc: any, block: any) => {
@@ -50,6 +57,28 @@ const createJsonSchemaFromEditorJs = (data: any) => {
     ${varsFromBlocks.join('\n')}
   }`
 }
+const createEditorJsText = (source: any, temp: any[]) => temp.reduce((acc, t) => `${acc}${t.type === 'text' ? t.value : source[t.path] ? source[t.path] : '_'}`,'')
+
+const createEditorJsFromTemplate = (sourceJson: any, template: any[]) => ({
+  time: new Date().getTime(),
+  blocks: template.map(block => ({
+    type: "paragraph",
+    data: {
+      text: createEditorJsText(sourceJson, block.children),
+      level: 1,
+    }
+  }))
+})
+
+const createDocxFromEditorJsData = (data: any) => new Document({
+  sections: [
+    {
+      children: data.blocks.map((block: any) => new Paragraph({
+        text: block.data.text
+      }))
+    }
+  ]
+})
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 
 export default function CreateTemplate() {
@@ -63,10 +92,33 @@ export default function CreateTemplate() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')  
   const fileName = watch('resume')
-  const [data, setData] = useState();
+  const [data, setData] = useState({
+    "time" : 1550476186479,
+    "blocks" : [
+        {
+            "type" : "paragraph",
+            "data" : {
+                "text" : "Создаем шаблон здесь"
+            }
+        },
+    ],
+    "version" : "2.8.1"
+});
   const [templates, setTemplates] = useState([]);
+  const [templateName, setTemplateName] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState([])
   const [selectedSchema, setSelectedSchema] = useState()
+  const [processedData, setProcessedData] = useState<{
+    time: number;
+    blocks: {
+        type: string;
+        data: {
+            text: any;
+            level: number;
+        };
+    }[];
+} | undefined>()
+  const [selectedTemplateName, setSelectedTemplateName] = useState('')
 
   useEffect(() => {
     supabase.from('templates').select().then((res: any) => setTemplates(res.data))
@@ -76,21 +128,25 @@ export default function CreateTemplate() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       Template create form
       <Editor data={data} onChange={setData} editorblock="editorjs-container" />
-      <Button onClick={async () => {
-        const template = createTemplateFromEditorJs(data)
-        const schema = createJsonSchemaFromEditorJs(data)
-        await supabase.from('templates').insert({
-          template,
-          schema
-        })
-      }}>Сохранить шаблон</Button>
-      {templates.map(({ name, schema, template }) => <Button key={name} onClick={() => {
-        setSelectedSchema(schema)
-        setSelectedTemplate(template)
-      }}>{name}</Button>)}
-      <Modal open={!!selectedSchema && !!selectedTemplate}>
-        <>
       <Stack rowGap={2}>
+        <TextField label="Название шаболна" onChange={(ev) => setTemplateName(ev.target.value)} value={templateName} />
+        <Button onClick={async () => {
+          const template = createTemplateFromEditorJs(data)
+          const schema = createJsonSchemaFromEditorJs(data)
+          await supabase.from('templates').insert({
+            name: templateName,
+            template,
+            schema
+          })
+        }}>Сохранить шаблон</Button>
+        {templates.map(({ name, schema, template }) => <Button key={name} onClick={() => {
+          setSelectedSchema(schema)
+          setSelectedTemplateName(name)
+          setSelectedTemplate(template)
+        }}>{name}</Button>)}
+      </Stack>
+      <Modal open={!!selectedSchema && !!selectedTemplate}>
+        <Stack sx={{ backgroundColor: 'white' }} rowGap={2}>
           <Controller
             control={control}
             name="resume"
@@ -111,97 +167,85 @@ export default function CreateTemplate() {
                         }}}
                       {...field} 
                     />
-                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате doc, docx"}</Button>
+                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате docx"}</Button>
                     {errors.resume?.message && <FormHelperText>{errors.resume?.message}</FormHelperText>}
                   </FormControl>
               );
             }
           } />
           {fileName && <Stack direction="row" justifyContent="space-between"><Typography>{fileName.name}</Typography><CloseOutlined onClick={() => { setValue('resume', undefined) }}/></Stack>}
-          <FormControlLabel
-            control={
-              <Controller
-                name="branded"
-                control={control}
-                defaultValue={false}
-                render={({ field: { value, ref, ...field } }) => (
-                  <Checkbox
-                    {...field}
-                    inputRef={ref}
-                    checked={!!value}
-                    color="primary"
-                    size={"medium"}
-                    disableRipple
-                  />
-                )}
-              />
-            }
-            label="Брендированное"
-            labelPlacement="end"
-          />
-        </Stack>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setIsLoading(true)
-            handleSubmit(async ({ resume, branded }) => {
-              const formData = new FormData()
-              const currentTime = dayjs().toISOString() // TODO make folders by day
-              const currentDay = dayjs().format('DD-MM-YYYY')
-              const originalName = `${currentDay}/${currentTime}-original.docx`
-              const processedName = `${currentDay}/${currentTime}-processed.docx`
-              let originalLink = ''
-              if (resume) {
-                formData.append('resume', resume)
-                await supabase.storage.from(bucketName).upload(originalName, resume)
-                const { data: { publicUrl } } = supabase
-                  .storage
-                  .from(bucketName)
-                  .getPublicUrl(originalName, {
-                    download: true,
-                  })
-                originalLink = publicUrl
-              }
-              const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
-              
-              // axios.post('/api', formData)
-
-              supabase.functions.invoke('parse-document', { body: { text, schema: selectedSchema } })
-                .then(async ({data: { message, length }}) => {    
-                  const file = createDocxFromTemplate(JSON.parse(message), selectedTemplate)
-                  const blob = await Packer.toBlob(file)
-                  saveAs(blob, `fullVertical.docx`);
-                })
-                // .then(async ({ blob, name, length }) => {
-                //   saveAs(blob, `${name}.docx`);
-                  // await supabase.storage.from(bucketName).upload(processedName, blob)
-                  // const { data: { publicUrl: processedLink } } = supabase
+          <Button
+            variant="contained"
+            onClick={() => {
+              setIsLoading(true)
+              handleSubmit(async ({ resume }) => {
+                const formData = new FormData()
+                const currentTime = dayjs().toISOString() // TODO make folders by day
+                const currentDay = dayjs().format('DD-MM-YYYY')
+                const originalName = `${currentDay}/${currentTime}-original.docx`
+                const processedName = `${currentDay}/${currentTime}-processed.docx`
+                let originalLink = ''
+                if (resume) {
+                  formData.append('resume', resume)
+                  // await supabase.storage.from(bucketName).upload(originalName, resume)
+                  // const { data: { publicUrl } } = supabase
                   //   .storage
                   //   .from(bucketName)
-                  //   .getPublicUrl(processedName, {
+                  //   .getPublicUrl(originalName, {
                   //     download: true,
                   //   })
-                    
-                  // await supabase.from(tableName).insert({
-                  //   original_url: originalLink,
-                  //   processed_url: processedLink,
-                  //   token_length: length,
-                  //   name,
+                  // originalLink = publicUrl
+                }
+                const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
+                
+                // axios.post('/api', formData)
+
+                supabase.functions.invoke('parse-document', { body: { text, schema: selectedSchema } })
+                  .then(async ({data: { message, length }}) => {   
+                    const editorParsed = createEditorJsFromTemplate(JSON.parse(message), selectedTemplate)
+                    setProcessedData(editorParsed)
+                    // const file = createDocxFromTemplate(JSON.parse(message), selectedTemplate)
+                    // const blob = await Packer.toBlob(file)
+                    // saveAs(blob, `fullVertical.docx`);
+                  })
+                  // .then(async ({ blob, name, length }) => {
+                  //   saveAs(blob, `${name}.docx`);
+                    // await supabase.storage.from(bucketName).upload(processedName, blob)
+                    // const { data: { publicUrl: processedLink } } = supabase
+                    //   .storage
+                    //   .from(bucketName)
+                    //   .getPublicUrl(processedName, {
+                    //     download: true,
+                    //   })
+                      
+                    // await supabase.from(tableName).insert({
+                    //   original_url: originalLink,
+                    //   processed_url: processedLink,
+                    //   token_length: length,
+                    //   name,
+                    // })
+                  //   setIsLoading(false)          
                   // })
-                //   setIsLoading(false)          
-                // })
-                .catch(e => {
-                  console.log('error', e);
-                  
-                  setIsLoading(false)
-                  setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-                })
-            })()
-          }}        
-        >
-          Конвертировать CV в формат Cosysoft
-        </Button>
-        </>
+                  .catch(e => {
+                    console.log('error', e);
+                    
+                    setIsLoading(false)
+                    setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+                  })
+              })()
+            }}        
+          >
+            Конвертировать CV по шаблону
+          </Button>
+          {processedData && <Editor data={processedData} onChange={setProcessedData} editorblock="editorjs-parsed" />}
+          {processedData && <Button onClick={async () => {
+            const file = createDocxFromEditorJsData(processedData)
+            const blob = await Packer.toBlob(file)
+            saveAs(blob, `${selectedTemplateName}-${dayjs().toISOString()}.docx`);
+            setSelectedSchema(undefined)
+            setSelectedTemplate([])
+          }}>Сохранить в Docx</Button>}
+        </Stack>
       </Modal>
     </main>
   );
