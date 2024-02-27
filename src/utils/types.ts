@@ -40,3 +40,19 @@ export interface CosysoftCV {
       technologiesUsed: string[]
     }[],  
 }
+
+export interface NlmkCV {
+  position: string,
+  name: string,
+  birthdate: string,
+  employer: string,
+  employerAddress: string,
+  phoneNumber: string,
+  contactPerson: string,
+  experience: string,
+  projects: {
+    start: string,
+    end: string,
+    description: string,
+  }[]
+}

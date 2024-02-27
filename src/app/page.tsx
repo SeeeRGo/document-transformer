@@ -78,7 +78,7 @@ export default function CosysoftTemplate() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')  
   const fileName = watch('resume')
-  const [data, setData] = useState(INITIAL_DATA);
+  // const [data, setData] = useState(INITIAL_DATA);
 
 
   return (
