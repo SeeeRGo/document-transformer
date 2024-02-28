@@ -1,7 +1,7 @@
 "use client"
 import axios from "axios";
 import { saveAs } from "file-saver";
-import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, Snackbar, Stack, Typography } from "@mui/material"
+import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, MenuItem, Select, Snackbar, Stack, Typography } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
@@ -10,12 +10,16 @@ import { useState } from "react";
 import { createClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
-import Editor from "@/components/editor";
-import { Document, Packer, Paragraph, TextRun } from "docx";
 
+type TemplateType = 'Cosysoft' | 'NLMK' | 'CosysoftBranded'
+const TEMPLATE_TYPE_OPTIONS: Record<TemplateType, string> = {
+  Cosysoft: 'Cosysoft',
+  NLMK: 'НЛМК',
+  CosysoftBranded: 'Брендированный Cosysoft',
+}
 interface Inputs {
-  branded: boolean
   resume: File | undefined
+  templateType: TemplateType
 }
 
 const parsedJsonMock = {
@@ -120,18 +124,21 @@ export default function CosysoftTemplate() {
           <FormControlLabel
             control={
               <Controller
-                name="branded"
+                name="templateType"
                 control={control}
-                defaultValue={false}
+                defaultValue={"Cosysoft"}
                 render={({ field: { value, ref, ...field } }) => (
-                  <Checkbox
+                  <Select
                     {...field}
                     inputRef={ref}
-                    checked={!!value}
+                    value={value}
                     color="primary"
                     size={"medium"}
-                    disableRipple
-                  />
+                  >
+                    {Object.entries(TEMPLATE_TYPE_OPTIONS).map(([key, value]) => (
+                      <MenuItem key={key} value={key}>{value}</MenuItem>
+                    ))}
+                  </Select>
                 )}
               />
             }
@@ -143,7 +150,7 @@ export default function CosysoftTemplate() {
           variant="contained"
           onClick={() => {
             setIsLoading(true)
-            handleSubmit(async ({ resume, branded }) => {
+            handleSubmit(async ({ resume, templateType }) => {
               const formData = new FormData()
               const currentTime = dayjs().toISOString() // TODO make folders by day
               const currentDay = dayjs().format('DD-MM-YYYY')

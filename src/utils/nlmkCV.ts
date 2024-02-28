@@ -269,7 +269,7 @@ export const createNlmkDocument = ({
                 }),
               ]
             }),
-            ...projects.map(({ start, end, description }) => new TableRow({
+            ...projects.map(({ start, end, shortDescription, role, duties }) => new TableRow({
               children: [
                 new TableCell({
                   children: [
@@ -288,8 +288,14 @@ export const createNlmkDocument = ({
                 new TableCell({
                   children: [
                     new Paragraph({
-                      text: description
-                    })
+                      text: shortDescription
+                    }),
+                    new Paragraph({
+                      text: role
+                    }),
+                    ...duties.map((duty, i) => new Paragraph({
+                      text: `${i+1}. ${duty}`
+                    }),)
                   ],
                 }),
               ]

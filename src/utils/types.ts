@@ -53,6 +53,8 @@ export interface NlmkCV {
   projects: {
     start: string,
     end: string,
-    description: string,
+    shortDescription: string,
+    role: string,
+    duties: string[],
   }[]
 }
