@@ -5,92 +5,46 @@ import OpenAI from 'npm:openai';
 import { corsHeaders } from '../_shared/cors.ts';
 import { encodingForModel } from 'npm:js-tiktoken'
 
-
-console.log("Hello from Functions!")
 const baseSchema = `{
-  name: string,
   position: string,
-  grade: string | null,
-  age: number,
-  experience: string,
-  location: string,
-  technologies: string[],
-  databases: string[],
-  operatingSystems: string[],
-  webTechnologies: string[],
-  devTools: string[],
-  programmingLanguages: string[],
-  languages: {
-    level: string,
-    name: string,
-  }[],
-  personalInfo: {
-    gender: string,
-    birthday: string,
-    citizenship: string,
-    workPermit: string,
-    relocation: string,
-    businessTrips: string
-  },
-  education: {
-    level: string,
-    year: number,
-    institution: string,
-    specialization: string
-  },
-  certificates: string[],
-  courses: string[],
-}`
-const fullSchema = `{
   name: string,
-  position: string,
-  grade: string | null,
-  age: number,
+  birthdate: string,
+  employer: string,
+  employerAddress: string,
+  phoneNumber: string,
+  contactPerson: string,
   experience: string,
-  location: string,
-  technologies: string[],
-  databases: string[],
-  operatingSystems: string[],
-  webTechnologies: string[],
-  devTools: string[],
-  programmingLanguages: string[],
-  languages: {
-    level: string,
-    name: string,
-  }[],
-  personalInfo: {
-    gender: string,
-    birthday: string,
-    citizenship: string,
-    workPermit: string,
-    relocation: string,
-    businessTrips: string
-  },
-  education: {
-    level: string,
-    year: number,
-    institution: string,
-    specialization: string
-  },
-  certificates: string[],
-  courses: string[],
-  projects: {
-      name: string,
-      description: string,
-      duration: string,
-      role: string,
-      duties: string[],
-      technologiesUsed: string[]
-    }[],  
 }`
+
 const projectSchema = `{
-  name: string,
-  description: string,
-  duration: string,
-  role: string,
-  duties: string[],
-  technologiesUsed: string[]
+  projects: {
+    start: string,
+    end: string,
+    shortDescription: string,
+    role: string,
+    duties: string[],
+  }[]
 }`
+
+const fullSchema = `
+{
+  position: string,
+  name: string,
+  birthdate: string,
+  employer: string,
+  employerAddress: string,
+  phoneNumber: string,
+  contactPerson: string,
+  experience: string,
+  projects: {
+    start: string,
+    end: string,
+    shortDescription: string,
+    role: string,
+    duties: string[],
+  }[]
+}
+`
 
 const projectNamesSchema = `{
   projects: ${projectSchema}[]
@@ -103,11 +57,11 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-  const { text, schema } = await req.json()  
+  const { text } = await req.json()  
   if (text) {
     const encoding = encodingForModel('gpt-3.5-turbo-0125')
     const tokens = encoding.encode(text)
-    if (tokens.length > 1700 && !schema) {
+    if (tokens.length > 1700) {
       let projectsText = text
       if (tokens.length > 2800) {
         const projectsSummary = await client.chat.completions.create({
