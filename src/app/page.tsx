@@ -1,11 +1,11 @@
 "use client"
 import axios from "axios";
 import { saveAs } from "file-saver";
-import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, MenuItem, Select, Snackbar, Stack, Typography } from "@mui/material"
+import { Alert, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, Snackbar, Stack, StackProps, Typography, styled } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
-import { createFile } from "@/utils/createFile";
+import { createFile, createNlmkFile } from "@/utils/createFile";
 import { useState } from "react";
 import { createClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
@@ -67,6 +67,19 @@ const createEditorJsFromTemplate = (sourceJson: any, template: any[]) => ({
   }))
 })
 
+const StyledStack = styled(Stack)<StackProps>(({ theme }) => ({
+  width: '100%', 
+  height: '100%',
+  [theme.breakpoints.down('md')]: {
+    minWidth: '100%',
+    maxWidth: '100%',
+  },
+  [theme.breakpoints.up('md')]: {
+    minWidth: 500,
+    maxWidth: 800,    
+  },
+}))
+
 const INITIAL_DATA = createEditorJsFromTemplate(parsedJsonMock, simplestTemplate);
 
 // Create a single supabase client for interacting with your database
@@ -84,7 +97,6 @@ export default function CosysoftTemplate() {
   const fileName = watch('resume')
   // const [data, setData] = useState(INITIAL_DATA);
 
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {isLoading ? (
@@ -92,12 +104,12 @@ export default function CosysoftTemplate() {
         <CircularProgress />
       </div>
     ) : (
-      <>
-        <Stack rowGap={2}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <StyledStack rowGap={2}>
           <Controller 
             control={control}
             name="resume"
-            // rules={{ required: 'Поле обязательно к заполнению' }}
+            rules={{ required: 'Поле обязательно к заполнению' }}
             render={
             ({ field: { value, onChange, ...field } }) => {          
               return (
@@ -107,30 +119,32 @@ export default function CosysoftTemplate() {
                       type="file"
                       hidden
                       id="file-input"
-                      accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={(event) => {
                         if (event.target.files) {
                           onChange(event.target.files[0]);
                         }}}
                       {...field} 
                     />
-                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате doc, docx"}</Button>
+                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате docx"}</Button>
                     {errors.resume?.message && <FormHelperText>{errors.resume?.message}</FormHelperText>}
                   </FormControl>
               );
             }
           } />
           {fileName && <Stack direction="row" justifyContent="space-between"><Typography>{fileName.name}</Typography><CloseOutlined onClick={() => { setValue('resume', undefined) }}/></Stack>}
-          <FormControlLabel
-            control={
-              <Controller
-                name="templateType"
-                control={control}
-                defaultValue={"Cosysoft"}
-                render={({ field: { value, ref, ...field } }) => (
+          <Controller
+            name="templateType"
+            control={control}
+            render={({ field: { value, ref, ...field } }) => {
+              return (
+                <FormControl>
+                  <InputLabel>Формат</InputLabel>
                   <Select
                     {...field}
                     inputRef={ref}
+                    label="Формат"
+                    defaultValue="Cosysoft"
                     value={value}
                     color="primary"
                     size={"medium"}
@@ -139,13 +153,10 @@ export default function CosysoftTemplate() {
                       <MenuItem key={key} value={key}>{value}</MenuItem>
                     ))}
                   </Select>
-                )}
-              />
-            }
-            label="Брендированное"
-            labelPlacement="end"
+              </FormControl>
+              );
+            }}
           />
-        </Stack>
         <Button
           variant="contained"
           onClick={() => {
@@ -172,12 +183,20 @@ export default function CosysoftTemplate() {
               
               // axios.post('/api', formData)
 
-              supabase.functions.invoke('parse-document', { body: { text } })
-                .then(async ({data: { message, length }}) => {    
-                  const file = await createFile(message ?? '', branded)
-                  return {
-                    ...file,
-                    length,
+              supabase.functions.invoke(templateType === 'NLMK' ? 'parse-nlmk' : 'parse-document', { body: { text } })
+                .then(async ({data: { message, length }}) => {   
+                  if (templateType === 'NLMK') {
+                    const file = await createNlmkFile(message ?? '')
+                    return {
+                      ...file,
+                      length,
+                    }
+                  } else {
+                    const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
+                    return {
+                      ...file,
+                      length,
+                    }
                   }
                 })
                 .then(async ({ blob, name, length }) => {
@@ -207,24 +226,10 @@ export default function CosysoftTemplate() {
             })()
           }}        
         >
-          Конвертировать CV в формат Cosysoft
+          Конвертировать CV в другой формат
         </Button>
-        {/* <Editor data={data} onChange={setData} editorblock="editorjs-container" />
-        <Button
-        className="savebtn"
-        onClick={() => {
-          alert(JSON.stringify(data));
-        }}
-        >
-          Save
-        </Button>
-        <Button onClick={async () => {
-            const blob = await Packer.toBlob(createDocxFromEditorJsData(data))
-            saveAs(blob, `fromTemplate.docx`);
-        }}>
-          Download Templated Result
-        </Button> */}
-      </>
+        </StyledStack>
+      </div>
     )
   }
       <Snackbar open={!!error} autoHideDuration={6000} onClose={() => { setError('') }}>

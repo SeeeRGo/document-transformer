@@ -1,5 +1,6 @@
-import { Document, Paragraph, Table, TableCell, TableRow, WidthType } from "docx";
+import { Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
 import { NlmkCV } from "./types";
+import { createParagraph } from "./createParagraph";
 
 export const createNlmkDocument = ({
   position,
@@ -15,15 +16,36 @@ export const createNlmkDocument = ({
   sections: [
     {
       children: [
+        createParagraph({ 
+          prefix: 'Краткие сведения о кандидате.',
+          useVariable: true,
+          variable: position,
+          params: {
+            bold: true,
+            size: 24,
+          }
+        }),
+        createParagraph({ 
+          useVariable: true,
+          variable: name,
+          params: {
+            bold: true,
+            size: 24,
+          }
+        }),
         new Table({
+          columnWidths: [2000, 4200, 3800],
           rows: [
             new TableRow({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'Должность'
-                    })
+                    createParagraph({ 
+                      prefix: 'Должность', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                   columnSpan: 2,
                 }),
@@ -37,9 +59,13 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: position
-                    })
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: position,
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                   columnSpan: 2,
                 }),
@@ -49,42 +75,33 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'Сведения о кандидате'
-                    })
+                    createParagraph({ 
+                      prefix: 'Сведения о кандидате', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                   rowSpan: 4,
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: '1. Имя кандидата'
-                    })
+                    createParagraph({ 
+                      prefix: '1. Имя кандидата', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: '2. Дата рождения'
-                    })
-                  ],
-                }),
-              ]
-            }),
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: name
-                    })
-                  ],
-                }),
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: birthdate
-                    })
+                    createParagraph({ 
+                      prefix: '2. Дата рождения', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
               ]
@@ -93,8 +110,46 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: '3. Профессиональная квалификация'
+                    createParagraph({ useVariable: true, variable: name, params: {
+                      bold: true,
+                      size: 24,
+                    }}),
+                  ],
+                }),
+                new TableCell({
+                  children: [
+                    createParagraph({ useVariable: true, variable: birthdate, params: {
+                      size: 24,
+                    }}),
+                  ],
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    createParagraph({ 
+                      prefix: '3. Профессиональная квалификация', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [                    
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: position,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                   columnSpan: 2
@@ -105,28 +160,38 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: position
-                    })
-                  ],
-                  columnSpan: 2
-                }),
-              ]
-            }),
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: 'Место работы в настоящее время'
-                    })
+                    createParagraph({ 
+                      prefix: 'Место работы в настоящее время', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                   rowSpan: 8
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: '4. Наименование организации'
+                    createParagraph({ 
+                      prefix: '4. Наименование организации', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: employer,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                   columnSpan: 2
@@ -137,8 +202,27 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: employer
+                    createParagraph({ 
+                      prefix: 'Адрес организации', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
+                  ],
+                  columnSpan: 2
+                }),
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: employerAddress,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                   columnSpan: 2
@@ -149,40 +233,22 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'Адрес организации'
-                    })
-                  ],
-                  columnSpan: 2
-                }),
-              ]
-            }),
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: employerAddress
-                    })
-                  ],
-                  columnSpan: 2
-                }),
-              ]
-            }),
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [
-                    new Paragraph({
-                      text: 'Телефон'
-                    })
+                    createParagraph({ 
+                      prefix: 'Телефон', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'Контакт (управляющий/ отв. за кадры)'
-                    })
+                    createParagraph({ 
+                      prefix: 'Контакт (управляющий/ отв. за кадры)', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
               ]
@@ -191,15 +257,23 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: phoneNumber
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: phoneNumber,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: contactPerson
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: contactPerson,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                 }),
@@ -209,15 +283,25 @@ export const createNlmkDocument = ({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: `Опыт ${position}`
+                    createParagraph({ 
+                      prefix: 'Опыт ',
+                      useVariable: true,
+                      variable: position,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: `Стаж работы на нынешнем месте ${experience}`
+                    createParagraph({ 
+                      prefix: 'Стаж работы на нынешнем месте ',
+                      useVariable: true,
+                      variable: experience,
+                      params: {
+                        size: 24,
+                      }
                     })
                   ],
                 }),
@@ -239,64 +323,109 @@ export const createNlmkDocument = ({
             type: WidthType.DXA
           }
         }),
-        new Paragraph({
-          text: 'Сведения о трудовой деятельности за последние 5 лет'
+        new Paragraph({}),
+        createParagraph({ 
+          prefix: 'Сведения о трудовой деятельности за последние 5 лет', 
+          params: {
+            size: 24,
+            bold: true,
+          }
         }),
         new Table({
+          columnWidths: [2000, 2000, 6000],
           rows: [
             new TableRow({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'С какого срока'
-                    })
+                    createParagraph({ 
+                      prefix: 'С какого срока', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ]
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'По какой срок'
-                    })
+                    createParagraph({ 
+                      prefix: 'По какой срок', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: 'Предприятие / Должность / соответствующий технический и управленческий опыт'
-                    })
+                    createParagraph({ 
+                      prefix: 'Предприятие / Должность / соответствующий технический и управленческий опыт', 
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ],
                 }),
               ]
             }),
-            ...projects.map(({ start, end, shortDescription, role, duties }) => new TableRow({
+            ...projects?.map(({ start, end, shortDescription, role, duties }) => new TableRow({
               children: [
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: start
-                    })
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: start,
+                      params: {
+                        size: 24,
+                      }
+                    }),
                   ]
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: end
-                    })
-                  ],
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: end,
+                      params: {
+                        size: 24,
+                      }
+                    }),
+                  ]
                 }),
                 new TableCell({
                   children: [
-                    new Paragraph({
-                      text: shortDescription
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: shortDescription,
+                      params: {
+                        size: 24,
+                      },
                     }),
-                    new Paragraph({
-                      text: role
+                    new Paragraph({}),
+                    createParagraph({ 
+                      useVariable: true,
+                      variable: role,
+                      params: {
+                        size: 24,
+                      },
                     }),
-                    ...duties.map((duty, i) => new Paragraph({
-                      text: `${i+1}. ${duty}`
-                    }),)
-                  ],
+                    new Paragraph({}),
+                    createParagraph({ 
+                      prefix: 'Объем работ:',
+                      params: {
+                        size: 24,
+                      },
+                    }),
+                    new Paragraph({}),
+                    ...duties.flatMap((duty, i) => [createParagraph({
+                      prefix: `${i+1}. ${duty}`,
+                      params: {
+                        size: 24,
+                      },                   
+                    }),
+                    new Paragraph({}),
+                  ])
+                  ]
                 }),
               ]
             }))
