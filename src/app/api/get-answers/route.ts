@@ -27,19 +27,19 @@ export async function POST(request: NextRequest) {
   `)
 
   const loader1 = new DocxLoader(
-    "src/documents/1.docx"
+    "../../../documents/1.docx"
   );
   
   const loader2 = new DocxLoader(
-    "src/documents/2.docx"
+    "../../../documents/2.docx"
   );
   
   const loader3 = new DocxLoader(
-    "src/documents/3.docx"
+    "../../../documents/3.docx"
   );
   
   const loader4 = new DocxLoader(
-    "src/documents/4.docx"
+    "../../../documents/4.docx"
   );
   
   const doc1 = await loader1.load();
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
-    chunkOverlap: 40,
+    chunkOverlap: 200,
   })
 
   const splitDocs = await splitter.splitDocuments(context)
