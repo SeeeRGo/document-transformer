@@ -12,7 +12,7 @@ import { MemoryVectorStore } from "langchain/vectorstores/memory"
 const client = new OpenAI();
 export async function POST(request: NextRequest) {
   const { text } = await request.json()
-  console.log('text', text);
+  console.log('process.cwd()', process.cwd());
   
   const model = new ChatOpenAI({
     modelName: "gpt-3.5-turbo",
@@ -27,19 +27,19 @@ export async function POST(request: NextRequest) {
   `)
 
   const loader1 = new DocxLoader(
-    "../../../documents/1.docx"
+    "./documents/1.docx"
   );
   
   const loader2 = new DocxLoader(
-    "../../../documents/2.docx"
+    "./documents/2.docx"
   );
   
   const loader3 = new DocxLoader(
-    "../../../documents/3.docx"
+    "./documents/3.docx"
   );
   
   const loader4 = new DocxLoader(
-    "../../../documents/4.docx"
+    "./documents/4.docx"
   );
   
   const doc1 = await loader1.load();
