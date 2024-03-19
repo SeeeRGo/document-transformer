@@ -33,7 +33,7 @@ export const Question = ({ onDelete }: IProps) => {
             handleSubmit(async ({ question }) => {
               setIsLoading(true)
               setAnswer('')
-              const { data: { data } }: { data: { data: string } } = await axios.post('/api/get-answers', { text: question })
+              const { data: { data } } = await supabase.functions.invoke('get-answer', { body: { text: question }})
               setAnswer(data)             
               setIsLoading(false)
             })()

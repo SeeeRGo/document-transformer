@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import OpenAI from 'openai';
 import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents"
@@ -8,7 +7,6 @@ import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { supabase } from '@/utils/db';
 
 // gets API Key from environment variable OPENAI_API_KEY
-const client = new OpenAI();
 export async function POST(request: NextRequest) {
   const { text } = await request.json()
   

@@ -3,17 +3,14 @@
 import { useEffect, useState } from "react";
 import { parseStringTemplate } from 'string-template-parser';
 import { saveAs } from "file-saver";
-import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
-import { Alert, Button, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, Modal, Snackbar, Stack, TextField, Typography } from "@mui/material"
+import { Button, FormControl, FormHelperText, Modal, Stack, TextField, Typography } from "@mui/material"
 import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 
 import { Controller, useForm } from "react-hook-form"
-import { createFile } from "@/utils/createFile";
 import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
 import { Document, Packer, Paragraph } from "docx";
-import { createDocxFromTemplate } from "@/utils/docxUtils";
 import dynamic from "next/dynamic";
 import { supabase } from "@/utils/db";
 const Editor = dynamic(() => import("../../components/editor"), {
