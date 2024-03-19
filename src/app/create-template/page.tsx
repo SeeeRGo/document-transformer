@@ -15,6 +15,7 @@ import { CloseOutlined } from "@mui/icons-material";
 import { Document, Packer, Paragraph } from "docx";
 import { createDocxFromTemplate } from "@/utils/docxUtils";
 import dynamic from "next/dynamic";
+import { supabase } from "@/utils/db";
 const Editor = dynamic(() => import("../../components/editor"), {
   ssr: false,
 });
@@ -79,7 +80,6 @@ const createDocxFromEditorJsData = (data: any) => new Document({
     }
   ]
 })
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 
 export default function CreateTemplate() {
   const {

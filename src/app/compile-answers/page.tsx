@@ -1,39 +1,26 @@
 "use client"
-import { CloseOutlined, FileUploadOutlined } from "@mui/icons-material";
-import { Button, FormControl, FormHelperText, Stack, TextField, Typography } from "@mui/material";
-import axios from "axios";
+import { Question } from "@/components/Question";
+import { Add } from "@mui/icons-material";
+import { Button, Stack } from "@mui/material";
+import dayjs from "dayjs";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 
-interface Inputs {
-  question: string
+interface QuestionParams {
+  id: string
 }
-
 export default function CompileAnswers() {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<Inputs>()
-
-  const [answer, setAnswer] = useState('')
-
+  const [questions, setQuestions] = useState<QuestionParams[]>([])
   return (
     <Stack rowGap={1}>
-      <TextField {...register("question")} />
-      <Button
-          variant="contained"
-          onClick={() => {
-            handleSubmit(async ({ question }) => {
-              setAnswer('')
-              const { data: { data } }: { data: { data: string } } = await axios.post('/api/get-answers', { text: question })
-              setAnswer(data)             
-            })()
-          }}        
-        >
-          Найти ответ
-        </Button>
-        {answer ? <Typography>{answer}</Typography> : null}
+      <Button onClick={() => {
+        setQuestions(val => [...val, { id: dayjs().toISOString() }])
+      }} startIcon={<Add />}>Ещё вопрос</Button>
+      {questions.map(({ id }) => (
+        <Question
+          key={id}
+          onDelete={() => setQuestions(value => value.filter(val => val.id !== id))}
+        />
+      ))}
     </Stack>
   )
 }
