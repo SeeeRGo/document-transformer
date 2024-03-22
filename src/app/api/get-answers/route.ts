@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const response = await retrievalChain.invoke({
     input: text,
-  })  
+  })
 
   return Response.json({ data: response.answer })
 
