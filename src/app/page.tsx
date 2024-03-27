@@ -19,7 +19,7 @@ const TEMPLATE_TYPE_OPTIONS: Record<TemplateType, string> = {
 }
 interface Inputs {
   resume: File | undefined
-  templateType: TemplateType
+  templateType: TemplateType[]
 }
 
 const parsedJsonMock = {
@@ -144,10 +144,10 @@ export default function CosysoftTemplate() {
                     {...field}
                     inputRef={ref}
                     label="Формат"
-                    defaultValue="Cosysoft"
                     value={value}
                     color="primary"
                     size={"medium"}
+                    multiple
                   >
                     {Object.entries(TEMPLATE_TYPE_OPTIONS).map(([key, value]) => (
                       <MenuItem key={key} value={key}>{value}</MenuItem>
@@ -182,47 +182,48 @@ export default function CosysoftTemplate() {
               const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
               // axios.post('/api', formData)
-
-              supabase.functions.invoke(templateType === 'NLMK' ? 'parse-nlmk' : 'parse-document', { body: { text } })
-                .then(async ({data: { message, length }}) => {   
-                  if (templateType === 'NLMK') {
-                    const file = await createNlmkFile(message ?? '')
-                    return {
-                      ...file,
-                      length,
+              if(templateType.includes('NLMK')) {
+                await supabase.functions.invoke( ? 'parse-nlmk' : 'parse-document', { body: { text } })
+                  .then(async ({data: { message, length }}) => {   
+                    if (templateType === 'NLMK') {
+                      const file = await createNlmkFile(message ?? '')
+                      return {
+                        ...file,
+                        length,
+                      }
+                    } else {
+                      const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
+                      return {
+                        ...file,
+                        length,
+                      }
                     }
-                  } else {
-                    const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
-                    return {
-                      ...file,
-                      length,
-                    }
-                  }
-                })
-                .then(async ({ blob, name, length }) => {
-                  saveAs(blob, `${name}.docx`);
-                  await supabase.storage.from(bucketName).upload(processedName, blob)
-                  const { data: { publicUrl: processedLink } } = supabase
-                    .storage
-                    .from(bucketName)
-                    .getPublicUrl(processedName, {
-                      download: true,
-                    })
-                    
-                  await supabase.from(tableName).insert({
-                    original_url: originalLink,
-                    processed_url: processedLink,
-                    token_length: length,
-                    name,
                   })
-                  setIsLoading(false)          
-                })
-                .catch(e => {
-                  console.log('error', e);
-                  
-                  setIsLoading(false)
-                  setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-                })
+                  .then(async ({ blob, name, length }) => {
+                    saveAs(blob, `${name}.docx`);
+                    await supabase.storage.from(bucketName).upload(processedName, blob)
+                    const { data: { publicUrl: processedLink } } = supabase
+                      .storage
+                      .from(bucketName)
+                      .getPublicUrl(processedName, {
+                        download: true,
+                      })
+                      
+                    await supabase.from(tableName).insert({
+                      original_url: originalLink,
+                      processed_url: processedLink,
+                      token_length: length,
+                      name,
+                    })
+                    setIsLoading(false)          
+                  })
+                  .catch(e => {
+                    console.log('error', e);
+                    
+                    setIsLoading(false)
+                    setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+                  })
+              }
             })()
           }}        
         >
