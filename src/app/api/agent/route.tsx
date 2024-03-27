@@ -2,7 +2,6 @@ import { ChatOpenAI } from '@langchain/openai'
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts'
 import { AgentExecutor, CreateOpenAIFunctionsAgentParams, createOpenAIFunctionsAgent } from 'langchain/agents'
 import { NextRequest } from 'next/server'
-import { TavilySearchResults } from '@langchain/community/tools/tavily_search'
 import { HumanMessage, AIMessage } from '@langchain/core/messages'
 import { Tool } from "@langchain/core/tools";
 import { CallbackManagerForToolRun } from '@langchain/core/callbacks/manager'
@@ -30,7 +29,6 @@ class TestTool extends Tool {
   description = 'This tool can tell you about Cosysoft'
 }
 
-const searchTool = new TavilySearchResults();
 const testTool = new TestTool()
 
 const tools: CreateOpenAIFunctionsAgentParams['tools'] = [testTool]
