@@ -11,11 +11,10 @@ import { createClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
 import { CloseOutlined } from "@mui/icons-material";
 
-type TemplateType = 'Cosysoft' | 'NLMK' | 'CosysoftBranded'
+type TemplateType = 'Generic' | 'NLMK'
 const TEMPLATE_TYPE_OPTIONS: Record<TemplateType, string> = {
-  Cosysoft: 'Cosysoft',
+  Generic: 'Стандартный',
   NLMK: 'НЛМК',
-  CosysoftBranded: 'Брендированный Cosysoft',
 }
 interface Inputs {
   resume: File | undefined

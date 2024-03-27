@@ -2,7 +2,7 @@ import { Packer } from "docx"
 import { createDocument } from "./cosysoftCV"
 import { createNlmkDocument } from "./nlmkCV"
 
-export const createFile = async (message: string, branded: boolean) => {
+export const createFile = async (message: string, branded: boolean = false) => {
   const blob = await Packer.toBlob(createDocument(JSON.parse(message), branded))
   const name = JSON.parse(message).name + ' - CV' + `${branded ? '-branded' : ''}`
   return {
