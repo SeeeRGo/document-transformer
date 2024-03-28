@@ -86,7 +86,7 @@ interface FileCreateParams {
   text: string
   templateType: TemplateType
 }
-const filenamePrefix = (type: TemplateType) => type === 'NLMK' ? 'nlmk' : type === 'Cosysoft' ? 'cosy' : 'cosy-branded'
+const filenamePrefix = (type: TemplateType) => type === 'NLMK' ? 'nlmk' : 'generic'
 const createFunction = ({
   originalLink,
   processedName,
@@ -102,7 +102,7 @@ const createFunction = ({
         length,
       }
     } else {
-      const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
+      const file = await createFile(message ?? '')
       return {
         ...file,
         length,
