@@ -86,7 +86,7 @@ interface FileCreateParams {
   text: string
   templateType: TemplateType
 }
-const filenamePrefix = (type: TemplateType) => type === 'NLMK' ? 'nlmk' : 'generic'
+const filenamePrefix = (type: TemplateType) => type === 'NLMK' ? 'nlmk-gen' : 'generic'
 const createFunction = ({
   originalLink,
   processedName,
