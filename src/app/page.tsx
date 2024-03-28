@@ -81,6 +81,53 @@ const StyledStack = styled(Stack)<StackProps>(({ theme }) => ({
 }))
 
 const INITIAL_DATA = createEditorJsFromTemplate(parsedJsonMock, simplestTemplate);
+interface FileCreateParams {
+  originalLink: string
+  processedName: string
+  text: string
+  templateType: TemplateType
+}
+const filenamePrefix = (type: TemplateType) => type === 'NLMK' ? 'nlmk' : type === 'Cosysoft' ? 'cosy' : 'cosy-branded'
+const createFunction = ({
+  originalLink,
+  processedName,
+  text,
+  templateType
+}: FileCreateParams) => {
+  return supabase.functions.invoke(templateType === 'NLMK' ? 'parse-nlmk' : 'parse-document', { body: { text } })
+  .then(async ({data: { message, length }}) => {
+    if (templateType === 'NLMK') {
+      const file = await createNlmkFile(message ?? '')
+      return {
+        ...file,
+        length,
+      }
+    } else {
+      const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
+      return {
+        ...file,
+        length,
+      }
+    }
+  })
+  .then(async ({ blob, name, length }) => {
+    saveAs(blob, `${name}.docx`);
+    await supabase.storage.from(bucketName).upload(`${filenamePrefix(templateType)}-${processedName}`, blob)
+    const { data: { publicUrl: processedLink } } = supabase
+      .storage
+      .from(bucketName)
+      .getPublicUrl(processedName, {
+        download: true,
+      })
+      
+    await supabase.from(tableName).insert({
+      original_url: originalLink,
+      processed_url: processedLink,
+      token_length: length,
+      name,
+    })
+  })
+}
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
@@ -144,6 +191,7 @@ export default function CosysoftTemplate() {
                     {...field}
                     inputRef={ref}
                     label="Формат"
+                    defaultValue={[]}
                     value={value}
                     color="primary"
                     size={"medium"}
@@ -182,48 +230,11 @@ export default function CosysoftTemplate() {
               const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
               // axios.post('/api', formData)
-              if(templateType.includes('NLMK')) {
-                await supabase.functions.invoke( ? 'parse-nlmk' : 'parse-document', { body: { text } })
-                  .then(async ({data: { message, length }}) => {   
-                    if (templateType === 'NLMK') {
-                      const file = await createNlmkFile(message ?? '')
-                      return {
-                        ...file,
-                        length,
-                      }
-                    } else {
-                      const file = await createFile(message ?? '', templateType === 'CosysoftBranded')
-                      return {
-                        ...file,
-                        length,
-                      }
-                    }
-                  })
-                  .then(async ({ blob, name, length }) => {
-                    saveAs(blob, `${name}.docx`);
-                    await supabase.storage.from(bucketName).upload(processedName, blob)
-                    const { data: { publicUrl: processedLink } } = supabase
-                      .storage
-                      .from(bucketName)
-                      .getPublicUrl(processedName, {
-                        download: true,
-                      })
-                      
-                    await supabase.from(tableName).insert({
-                      original_url: originalLink,
-                      processed_url: processedLink,
-                      token_length: length,
-                      name,
-                    })
-                    setIsLoading(false)          
-                  })
-                  .catch(e => {
-                    console.log('error', e);
-                    
-                    setIsLoading(false)
-                    setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-                  })
-              }
+              Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
+              .catch(e => {
+                console.log('error', e);
+                setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+              }))).then(() => { setIsLoading(false) })
             })()
           }}        
         >
