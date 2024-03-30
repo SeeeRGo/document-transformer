@@ -47,5 +47,4 @@ export async function POST(request: NextRequest) {
   })
 
   return Response.json({ data: response.answer })
-
 }

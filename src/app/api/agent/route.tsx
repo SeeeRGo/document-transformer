@@ -3,39 +3,51 @@ import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts
 import { AgentExecutor, CreateOpenAIFunctionsAgentParams, createOpenAIFunctionsAgent } from 'langchain/agents'
 import { NextRequest } from 'next/server'
 import { HumanMessage, AIMessage } from '@langchain/core/messages'
-import { Tool } from "@langchain/core/tools";
-import { CallbackManagerForToolRun } from '@langchain/core/callbacks/manager'
-import { RunnableConfig } from '@langchain/core/runnables'
+import { DynamicTool, DynamicStructuredTool } from "@langchain/core/tools";
+import { z } from "zod";
 
 const model = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
-  temperature: 0.7,
+  temperature: 0,
 })
 
 const prompt = ChatPromptTemplate.fromMessages([
-  ['system', 'You are a helpful assistant called Max'],
-  new MessagesPlaceholder('chat_history'),
+  ['system', 'You are a helpful assistant called Max.'],
+  // new MessagesPlaceholder('chat_history'),
   ['human', '{input}'],
   new MessagesPlaceholder('agent_scratchpad'),
 ])
 
-class TestTool extends Tool {
-  protected _call(arg: any, runManager?: CallbackManagerForToolRun | undefined, config?: RunnableConfig | undefined): Promise<string> {
-    console.log('calling test tool');
-    
-    return Promise.resolve('CosySoft exists')
+// const searchTool = new TavilySearchResults();
+const testTool = new DynamicTool({
+  name: "FOO",
+  description:
+    "call this to update . input should be an empty string.",
+  func: async () => "baz",
+})
+const relevantMessageTool = new DynamicTool({
+  name: "relevant-messages-processor",
+  description: "messages about react middle position should go here for the next step",
+  func: async () => {
+    console.log('interesting message');
+    return 'INTERESTING' // Outputs still must be strings
   }
-  name = 'TestTool'
-  description = 'This tool can tell you about Cosysoft'
-}
+})
+const ignoredMessageTool = new DynamicTool({
+  name: "ignored-messages-processor",
+  description: "messages without react middle position should go here for the next step",
+  func: async () => {
+    console.log('ignored message');
+    return 'IGNORED' // Outputs still must be strings
+  }
+})
 
-const testTool = new TestTool()
-
-const tools: CreateOpenAIFunctionsAgentParams['tools'] = [testTool]
+const tools: CreateOpenAIFunctionsAgentParams['tools'] = [relevantMessageTool, ignoredMessageTool]
 
 const chatHistory: Array<HumanMessage | AIMessage> = []
 
-export async function POST(request: NextRequest) {  
+export async function POST(request: NextRequest) {
+  const { message } = await request.json() 
   const agent = await createOpenAIFunctionsAgent({
     llm: model,
     prompt,
@@ -47,10 +59,8 @@ export async function POST(request: NextRequest) {
     tools
   })
 
-  const input = 'What is Cosysoft'
   const response = await agentExecutor.invoke({
-    input,
-    chat_history: chatHistory,
+    message,
   })
 
   console.log('response', response);

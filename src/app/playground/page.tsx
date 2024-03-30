@@ -8,11 +8,12 @@ export default function Playground() {
       {/* <Button onClick={async () => {
         await axios.post("/api/upload-documents")
       }}>Experiment</Button>       */}
-      <Button onClick={async () => {
-        console.log('click');
-        
+      <Button onClick={async () => {        
         await axios.post("/api/agent")
       }}>Invoke Agent</Button>
+      <Button onClick={async () => {        
+        await axios.post("/api/structured-output-chain")
+      }}>Get structured output</Button>
     </Stack>
   )
 }
