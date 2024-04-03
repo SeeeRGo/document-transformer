@@ -42,6 +42,11 @@ const ignoredMessageTool = new DynamicTool({
   }
 })
 
+// TODO make stack parsing tool
+// TODO make grade parsing tool
+// TODO make rate parsing tool
+// TODO make position message splitter tool
+
 const tools: CreateOpenAIFunctionsAgentParams['tools'] = [relevantMessageTool, ignoredMessageTool]
 
 const chatHistory: Array<HumanMessage | AIMessage> = []
