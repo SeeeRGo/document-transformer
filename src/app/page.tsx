@@ -128,7 +128,7 @@ const createFunction = ({
     })
   })
 }
-
+const getExtension = (type?: string) => type === 'application/pdf' ? 'pdf' : 'docx'
 // Create a single supabase client for interacting with your database
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 export default function CosysoftTemplate() {
@@ -143,6 +143,7 @@ export default function CosysoftTemplate() {
   const [error, setError] = useState('')  
   const fileName = watch('resume')
   // const [data, setData] = useState(INITIAL_DATA);
+  const isDev = process.env.NODE_ENV === 'development'  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -166,14 +167,14 @@ export default function CosysoftTemplate() {
                       type="file"
                       hidden
                       id="file-input"
-                      accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      accept=".docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={(event) => {
                         if (event.target.files) {
                           onChange(event.target.files[0]);
                         }}}
                       {...field} 
                     />
-                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате docx"}</Button>
+                    <Button startIcon={<FileUploadOutlined />} onClick={() => document.getElementById("file-input")?.click()} variant="outlined">{"Файл резюме в формате docx, pdf"}</Button>
                     {errors.resume?.message && <FormHelperText>{errors.resume?.message}</FormHelperText>}
                   </FormControl>
               );
@@ -213,11 +214,12 @@ export default function CosysoftTemplate() {
               const formData = new FormData()
               const currentTime = dayjs().toISOString() // TODO make folders by day
               const currentDay = dayjs().format('DD-MM-YYYY')
-              const originalName = `${currentDay}/${currentTime}-original.docx`
-              const processedName = `${currentDay}/${currentTime}-processed.docx`
+              const originalName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-original.${getExtension(resume?.type)}`
+              const processedName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-processed.docx`
               let originalLink = ''
               if (resume) {
                 formData.append('resume', resume)
+                
                 await supabase.storage.from(bucketName).upload(originalName, resume)
                 const { data: { publicUrl } } = supabase
                   .storage
@@ -229,7 +231,6 @@ export default function CosysoftTemplate() {
               }
               const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
-              // axios.post('/api', formData)
               Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
               .catch(e => {
                 console.log('error', e);
