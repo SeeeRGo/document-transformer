@@ -8,31 +8,7 @@ import { z } from "zod";
 
 // gets API Key from environment variable OPENAI_API_KEY
 export async function POST(request: NextRequest) {
-  const text = `⚡️⚡Коллеги, новые вакансии!
-
-  № 197 Разработчик PHP 
-  Рейт: в пределах рынка
-  Формат: удаленный формат 
-  Локация: только РФ (по времени Мск)
-  Продолжительность проекта: 3 месяца (с возможной пролангацией)
-  
-  № 198 Девопс - php laravel
-  Рейт: в пределах рынка
-  Формат: удаленный формат 
-  Локация: только РФ (по времени Мск)
-  Продолжительность проекта: 3 месяца (с возможной пролангацией)
-  
-  № 199 Тестировщик- ручной
-  Рейт: в пределах рынка
-  Формат: удаленный формат 
-  Локация: только РФ (по времени Мск)
-  Продолжительность проекта: 3 месяца (с возможной пролангацией)
-  
-  
-  Подробности по ссылке 
-  
-  Присылайте резюме в чатах с сотрудниками Outlines Tech!`
-  // const { text } = await request.json()
+  const { text } = await request.json()
 
   const parser1 = StructuredOutputParser.fromZodSchema(z.array(z.string()));
 
@@ -50,7 +26,7 @@ export async function POST(request: NextRequest) {
     parser1,
   ]);
   const response1 = await chain.invoke({
-    question: "What are job positions described in the message: " + text,
+    question: "What are job positions described in the message: " + '',
     format_instructions: parser1.getFormatInstructions(),
   });
   console.log('response', response1);
@@ -67,5 +43,5 @@ export async function POST(request: NextRequest) {
   })))
   console.log('res', res);
   
-  return Response.json({ data: res })
+  return Response.json({ data: res, source: text })
 }

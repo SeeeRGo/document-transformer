@@ -11,6 +11,7 @@ const model = new ChatOpenAI({
   temperature: 0,
 })
 
+
 const prompt = ChatPromptTemplate.fromMessages([
   ['system', 'You are a helpful assistant called Max.'],
   // new MessagesPlaceholder('chat_history'),
