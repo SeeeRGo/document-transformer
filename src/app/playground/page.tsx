@@ -38,10 +38,10 @@ export default function Playground() {
       }}>Parse message</Button>
       <Grid2>
         {processedMessages.map(({ techStack, hourlyRate, gradeRequirements, raw }, i) => <Card key={i}>
-          <Typography component="p">Стек: {techStack}</Typography>
-          <Typography component="p">Рейт: {hourlyRate}</Typography>
-          <Typography component="p">Грейд(ы): {gradeRequirements}</Typography>
-          <Typography component="p">Оригинал: {raw}</Typography>
+          <Typography>Стек: {techStack}</Typography>
+          <Typography>Рейт: {hourlyRate}</Typography>
+          <Typography>Грейд(ы): {gradeRequirements}</Typography>
+          <Typography>Оригинал: {raw}</Typography>
         </Card>)}
       </Grid2>
     </Stack>
