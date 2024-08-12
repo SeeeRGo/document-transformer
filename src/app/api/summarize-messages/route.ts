@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     const response = await client.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
         messages: [
-          {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-          {"role": "user", "content": `Parse following CV into JSON fitting this schema ${parsedSchema}
+          {"role": "system", "content": "Ты полезный ассистент помогающий конвертировать информацию из резюме в формат JSON."},
+          {"role": "user", "content": `Достань из предложенного текста резюме информацию в соответствии со следующей JSON схемой. Оставляй информацию на языке, который использован в исходном тексте ${parsedSchema}
           ${text}`,}
         ],
         response_format: {"type": "json_object"}

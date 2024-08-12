@@ -29,27 +29,32 @@ export const createDocument = ({
         new Paragraph({
           children: [new TextRun({
             text: 'ФИО: ',
+            font: 'Arial',
             size: 40,
           }), 
           new TextRun({
             text: name ? `${name}` : '_',
             highlight: name ? undefined : 'red',
+            font: 'Arial',
             size: 40
           })],
         }),        
         new Paragraph({
           children: [
             new TextRun({
-              text: '<Позиция: ',
+              text: '< Позиция: ',
+              font: 'Arial',
               size: 28,
             }), 
             new TextRun({
               text: position ? `${position}` : '_',
               highlight: position ? undefined : 'red',
+              font: 'Arial',
               size: 28,
             }),
             new TextRun({
-              text: '>',
+              text: ' >',
+              font: 'Arial',
               size: 28,
             })
           ]
@@ -57,16 +62,19 @@ export const createDocument = ({
         new Paragraph({
           children: [
             new TextRun({
-              text: '<Грейд: ',
+              text: '< Грейд: ',
+              font: 'Arial',
               size: 28,
             }), 
             new TextRun({
               text: grade ?? '_',
               highlight: grade ? undefined : 'red',
+              font: 'Arial',
               size: 28
             }),
             new TextRun({
-              text: '>',
+              text: ' >',
+              font: 'Arial',
               size: 28,
             })
           ]
@@ -74,16 +82,19 @@ export const createDocument = ({
         new Paragraph({
           children: [
             new TextRun({
-              text: '<Возраст: ',
+              text: '< Возраст: ',
+              font: 'Arial',
               size: 28,
             }), 
             new TextRun({
               text: `${age}` ?? '_',
               highlight: age ? undefined : 'red',
+              font: 'Arial',
               size: 28,
             }),
             new TextRun({
-              text: '>',
+              text: ' >',
+              font: 'Arial',
               size: 28
             })
           ]
@@ -91,16 +102,19 @@ export const createDocument = ({
         new Paragraph({
           children: [
             new TextRun({
-              text: '<Стаж: ',
+              text: '< Стаж: ',
+              font: 'Arial',
               size: 28
             }), 
             new TextRun({
               text: experience ?? '_',
               highlight: experience ? undefined : 'red',
+              font: 'Arial',
               size: 28,
             }),
             new TextRun({
-              text: '>',
+              text: ' >',
+              font: 'Arial',
               size: 28,
             })
           ]
@@ -108,16 +122,19 @@ export const createDocument = ({
         new Paragraph({
           children: [
             new TextRun({
-              text: '<Локация: ',
+              text: '< Локация: ',
+              font: 'Arial',
               size: 28,
             }), 
             new TextRun({
               text: location ?? '_',
               highlight: location ? undefined : 'red',
+              font: 'Arial',
               size: 28,
             }),
             new TextRun({
-              text: '>',
+              text: ' >',
+              font: 'Arial',
               size: 28,
             })
           ]
@@ -127,6 +144,7 @@ export const createDocument = ({
           children: [
             new TextRun({
               text: 'Технические навыки: ',
+              font: 'Arial',
               size: 40,
             }),
           ]
@@ -136,12 +154,14 @@ export const createDocument = ({
           children: [
             new TextRun({
               text: 'Общие: ',
+              font: 'Arial',
               bold: true,
               size: 22,
             }), 
             new TextRun({
               text: technologies?.length ? technologies?.join(', ') : '_',
               highlight: technologies?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -151,11 +171,13 @@ export const createDocument = ({
             new TextRun({
               text: 'Языки программирования: ',
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: programmingLanguages?.length ? programmingLanguages?.join(', ') : '_',
               highlight: programmingLanguages?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -165,11 +187,13 @@ export const createDocument = ({
             new TextRun({
               text: `Операционные системы: `,
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: operatingSystems?.length ? operatingSystems?.join(', ') : '_',
               highlight: operatingSystems?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -179,11 +203,13 @@ export const createDocument = ({
             new TextRun({
               text: `Веб технологии: `,
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: webTechnologies?.length ? webTechnologies?.join(', ') : '_',
               highlight: webTechnologies?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -193,11 +219,13 @@ export const createDocument = ({
             new TextRun({
               text: `Базы данных: `,
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: databases?.length ? databases?.join(', ') : '_',
               highlight: databases?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -207,11 +235,13 @@ export const createDocument = ({
             new TextRun({
               text: `Инструменты разработки: `,
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: devTools?.length ? devTools?.join(', ') : '_',
               highlight: devTools?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             }),
           ]
@@ -223,6 +253,7 @@ export const createDocument = ({
           children: [
             new TextRun({
               text: `Личная информация: `,
+              font: 'Arial',
               size: 40,
             }),
           ],
@@ -235,6 +266,7 @@ export const createDocument = ({
             new TextRun({
               text: 'Иностранные языки: ',
               bold: true,
+              font: 'Arial',
               size: 22,
             }),
           ],
@@ -243,6 +275,7 @@ export const createDocument = ({
           ? languages?.flatMap(language => new Paragraph({ children: [
             new TextRun({
               text: `${language.name} ${language.level}`,
+              font: 'Arial',
               size: 22,
             })
           ],
@@ -251,6 +284,7 @@ export const createDocument = ({
               new TextRun({
                 text: '_',
                 highlight:'red',
+                font: 'Arial',
                 size: 22,
               }),
             ]})],
@@ -259,11 +293,13 @@ export const createDocument = ({
             new TextRun({
               text: 'Образование: ',
               size: 22,
+              font: 'Arial',
               bold: true,
             }),
             new TextRun({
               text: education && (Object.keys(education)).length ? `${education.level}, ${education.institution}, ${education.specialization}, ${education.year}` : '_',
               highlight: education && (Object.keys(education)).length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
             })
           ],
@@ -273,11 +309,13 @@ export const createDocument = ({
             new TextRun({
               text: 'Курсы: ',
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
           new TextRun({
             text: courses?.length ? courses?.join(', ') : '_',
             highlight: courses?.length ? undefined : 'red',
+            font: 'Arial',
             size: 22,
           })
         ],
@@ -287,11 +325,13 @@ export const createDocument = ({
             new TextRun({
               text: `Сертификаты: `,
               bold: true,
+              font: 'Arial',
               size: 22,
             }), 
             new TextRun({
               text: certificates?.length ? certificates?.join(', ') : '_',
               highlight: certificates?.length ? undefined : 'red',
+              font: 'Arial',
               size: 22,
 
             }),
@@ -301,6 +341,7 @@ export const createDocument = ({
           children: [
             new TextRun({
               text: `Проекты: `,
+              font: 'Arial',
               size: 40,
             }),
           ],
@@ -312,6 +353,7 @@ export const createDocument = ({
               new TextRun({
                 text: `Наименование проекта: ${project?.name}`,
                 size: 22,
+                font: 'Arial',
                 bold: true,
               }),
             ],
@@ -325,47 +367,13 @@ export const createDocument = ({
                   new TableCell({
                     children: [
                       new Paragraph({
-                        text: 'Краткое описание проекта'
-                      })
-                    ],
-                    width: { size: 2500, type: WidthType.DXA },
-                  }),
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        text: project?.description ?? ''
-                      })
-                    ],
-                    width: { size: 7500, type: WidthType.DXA },
-                  }),
-                ],
-              }),
-              new TableRow({
-                children: [
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        text: 'Срок пребывания на проекте'
-                      })
-                    ],
-                    width: { size: 2500, type: WidthType.DXA },
-                  }),
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        text: project?.duration ?? ''
-                      })
-                    ],
-                    width: { size: 7500, type: WidthType.DXA },
-                  }),
-                ],
-              }),
-              new TableRow({
-                children: [
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        text: 'Роль в проекте'
+                        children: [
+                          new TextRun({
+                            text: 'Краткое описание проекта',
+                            size: 22,
+                            font: 'Arial',
+                          })
+                        ],
                       })
                     ],
                     width: { size: 2500, type: WidthType.DXA },
@@ -375,8 +383,9 @@ export const createDocument = ({
                       new Paragraph({
                         children: [
                           new TextRun({
-                            text: project?.role ?? '_',
-                            highlight: project?.role ? undefined : 'red',
+                            text: project?.description ?? '',
+                            size: 22,
+                            font: 'Arial',
                           })
                         ],
                       })
@@ -390,7 +399,79 @@ export const createDocument = ({
                   new TableCell({
                     children: [
                       new Paragraph({
-                        text: 'Обязанности / Задачи'
+                        children: [
+                          new TextRun({
+                            text: 'Срок пребывания на проекте',
+                            size: 22,
+                            font: 'Arial',
+                          })
+                        ],
+
+                      })
+                    ],
+                    width: { size: 2500, type: WidthType.DXA },
+                  }),
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: project?.duration ?? '',
+                            size: 22,
+                            font: 'Arial',
+                          })
+                        ],
+                      })
+                    ],
+                    width: { size: 7500, type: WidthType.DXA },
+                  }),
+                ],
+              }),
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: 'Роль в проекте',
+                            size: 22,
+                            font: 'Arial',
+                          })
+                        ],
+                      })
+                    ],
+                    width: { size: 2500, type: WidthType.DXA },
+                  }),
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: project?.role ?? '_',
+                            highlight: project?.role ? undefined : 'red',
+                            font: 'Arial',
+                            size: 22,
+                          })
+                        ],
+                      })
+                    ],
+                    width: { size: 7500, type: WidthType.DXA },
+                  }),
+                ],
+              }),
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: 'Обязанности / Задачи',
+                            font: 'Arial',
+                            size: 22,
+                          })
+                        ],
                       })
                     ],
                     width: { size: 2500, type: WidthType.DXA },
@@ -398,7 +479,16 @@ export const createDocument = ({
                   }),
                   new TableCell({
                     children: project?.duties?.map(duty => new Paragraph({
-                      text: ` -   ${duty}`,
+                      children: [
+                        new TextRun({
+                          text: `${duty}`,
+                          font: 'Arial',
+                          size: 22,
+                        })
+                      ],
+                      bullet: {
+                        level: 0
+                      }
                     })) ?? [],
                     width: { size: 7500, type: WidthType.DXA },
                   }),
@@ -409,7 +499,13 @@ export const createDocument = ({
                   new TableCell({
                     children: [
                       new Paragraph({
-                        text: 'Применяемые  технологии'
+                        children: [
+                          new TextRun({
+                            text: 'Применяемые  технологии',
+                            font: 'Arial',
+                            size: 22,
+                          })
+                        ],
                       })
                     ],
                     width: { size: 2500, type: WidthType.DXA },
@@ -417,7 +513,13 @@ export const createDocument = ({
                   new TableCell({
                     children: [
                       new Paragraph({
-                        text: project?.technologiesUsed?.join(', ') ?? ''
+                        children: [
+                          new TextRun({
+                            text: project?.technologiesUsed?.join(', ') ?? '',
+                            font: 'Arial',
+                            size: 22,
+                          })
+                        ],
                       })
                     ],
                     width: { size: 7500, type: WidthType.DXA },
