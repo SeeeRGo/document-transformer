@@ -212,30 +212,51 @@ export default function CosysoftTemplate() {
             setIsLoading(true)
             handleSubmit(async ({ resume, templateType }) => {
               const formData = new FormData()
-              const currentTime = dayjs().toISOString() // TODO make folders by day
-              const currentDay = dayjs().format('DD-MM-YYYY')
-              const originalName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-original.${getExtension(resume?.type)}`
-              const processedName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-processed.docx`
-              let originalLink = ''
+              // const currentTime = dayjs().toISOString() // TODO make folders by day
+              // const currentDay = dayjs().format('DD-MM-YYYY')
+              // const originalName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-original.${getExtension(resume?.type)}`
+              // const processedName = `${isDev ? 'dev/': ''}${currentDay}/${currentTime}-processed.docx`
+              // let originalLink = ''
               if (resume) {
                 formData.append('resume', resume)
                 
-                await supabase.storage.from(bucketName).upload(originalName, resume)
-                const { data: { publicUrl } } = supabase
-                  .storage
-                  .from(bucketName)
-                  .getPublicUrl(originalName, {
-                    download: true,
-                  })
-                originalLink = publicUrl
+                // await supabase.storage.from(bucketName).upload(originalName, resume)
+                // const { data: { publicUrl } } = supabase
+                //   .storage
+                //   .from(bucketName)
+                //   .getPublicUrl(originalName, {
+                //     download: true,
+                //   })
+                // originalLink = publicUrl
               }
-              const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
+              // const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
               
-              Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
-              .catch(e => {
-                console.log('error', e);
-                setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-              }))).then(() => { setIsLoading(false) })
+              // Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
+              // .catch(e => {
+              //   console.log('error', e);
+              //   setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+              // }))).then(() => { setIsLoading(false) })
+              Promise.allSettled(templateType.map(type => {
+                return axios.post('/api', formData)
+                .then(async ({data: { message, length }}) => {
+                  if (type === 'NLMK') {
+                    const file = await createNlmkFile(message ?? '')
+                    return {
+                      ...file,
+                      length,
+                    }
+                  } else {
+                    const file = await createFile(message ?? '', type === 'CosysoftBranded')
+                    return {
+                      ...file,
+                      length,
+                    }
+                  }
+                })
+                .then(async ({ blob, name, length }) => {
+                  saveAs(blob, `${name}.docx`)
+                })
+              }))
             })()
           }}        
         >

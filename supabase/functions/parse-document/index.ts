@@ -4,97 +4,66 @@
 import OpenAI from 'npm:openai';
 import { corsHeaders } from '../_shared/cors.ts';
 import { encodingForModel } from 'npm:js-tiktoken'
-
+import { zodResponseFormat } from 'npm:openai/helpers/zod';
+import z from 'npm:zod'
 
 console.log("Hello from Functions!")
-const baseSchema = `{
-  name: string,
-  position: string,
-  grade: string | null,
-  age: number,
-  experience: string,
-  location: string,
-  technologies: string[],
-  databases: string[],
-  operatingSystems: string[],
-  webTechnologies: string[],
-  devTools: string[],
-  programmingLanguages: string[],
-  languages: {
-    level: string,
-    name: string,
-  }[],
-  personalInfo: {
-    gender: string,
-    birthday: string,
-    citizenship: string,
-    workPermit: string,
-    relocation: string,
-    businessTrips: string
-  },
-  education: {
-    level: string,
-    year: number,
-    institution: string,
-    specialization: string
-  },
-  certificates: string[],
-  courses: string[],
-}`
-const fullSchema = `{
-  name: string,
-  position: string,
-  grade: string | null,
-  age: number,
-  experience: string,
-  location: string,
-  technologies: string[],
-  databases: string[],
-  operatingSystems: string[],
-  webTechnologies: string[],
-  devTools: string[],
-  programmingLanguages: string[],
-  languages: {
-    level: string,
-    name: string,
-  }[],
-  personalInfo: {
-    gender: string,
-    birthday: string,
-    citizenship: string,
-    workPermit: string,
-    relocation: string,
-    businessTrips: string
-  },
-  education: {
-    level: string,
-    year: number,
-    institution: string,
-    specialization: string
-  },
-  certificates: string[],
-  courses: string[],
-  projects: {
-      name: string,
-      description: string,
-      duration: string,
-      role: string,
-      duties: string[],
-      technologiesUsed: string[]
-    }[],  
-}`
-const projectSchema = `{
-  name: string,
-  description: string,
-  duration: string,
-  role: string,
-  duties: string[],
-  technologiesUsed: string[]
-}`
+const ProjectSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  startDate: z.string().describe('Date of the start of the project. Format date as MM.YYYY'),
+  endDate: z.string().nullable().describe('Date of the end of the project. Format date as MM.YYYY, leave as null if no end date provided'),
+  role: z.string(),
+  duties: z.array(z.string()),
+  technologiesUsed: z.array(z.string())
+})
 
-const projectNamesSchema = `{
-  projects: ${projectSchema}[]
-}`
+const EducationSchema = z.object({
+  level: z.string(),
+  yearGraduated: z.string(),
+  institution: z.string(),
+  specialization: z.string(),
+})
+const BaseDoc = z.object({
+  name: z.string(),
+  position: z.string(),
+  grade: z.enum(['junior', 'middle', 'senior']),
+  age: z.number().optional(),
+  yearsExperience: z.number(),
+  location: z.object({
+    country: z.string(),
+    city: z.string().nullable()
+  }),
+  technologies: z.array(z.string()),
+  databases: z.array(z.string()),
+  operatingSystems: z.array(z.string()),
+  webTechnologies: z.array(z.string()),
+  devTools: z.array(z.string()),
+  programmingLanguages: z.array(z.string()),
+  languages: z.array(z.object({
+    name: z.string(),
+    level: z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']),
+  })),
+  personalInfo: z.object({
+    gender: z.enum(['Male', 'Female']),
+    birthday: z.string().optional(),
+    citizenship: z.string(),
+    workPermit: z.string(),
+    readyToRelocate: z.boolean(),
+    readyForBusinessTrips: z.boolean(),
+  }),
+  education: z.array(EducationSchema),
+  certificates: z.array(z.string()),
+  courses: z.array(z.string()),
+})
+const Projects = {
+  projects: z.array(ProjectSchema)
+}
+const ProjectsSchema = z.object(Projects)
+
+const FullSchema = BaseDoc.extend(Projects)
+
+const model = 'gpt-4o-mini'
 // gets API Key from environment variable OPENAI_API_KEY
 const client = new OpenAI();
 Deno.serve(async (req: Request) => {
@@ -105,84 +74,50 @@ Deno.serve(async (req: Request) => {
   }
   const { text, schema } = await req.json()  
   if (text) {
-    const encoding = encodingForModel('gpt-3.5-turbo-0125')
+    const encoding = encoding_for_model('gpt-4o')
     const tokens = encoding.encode(text)
-    if (tokens.length > 1700 && !schema) {
-      let projectsText = text
-      if (tokens.length > 2800) {
-        const projectsSummary = await client.chat.completions.create({
-          model: 'gpt-3.5-turbo-0125',
-          messages: [
-            {"role": "system", "content": "You are a helpful assistant carefully extracting information about work experience from CVs"},
-            {"role": "user", "content": `Get me information about work experience from this CV in Russian
-            ${text}`,}
-          ],
-        })
-        projectsText = projectsSummary.choices?.at(0)?.message?.content ?? ''
-        console.log('projects text', projectsText);
-        
-      }
-        const projects = await client.chat.completions.create({
-        model: 'gpt-3.5-turbo-0125',
+    if (tokens.length > 2500) {
+      const projects = await client.beta.chat.completions.parse({
+        model,
         messages: [
-          {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-          {"role": "user", "content": `Parse following CV into JSON fitting this schema ${projectNamesSchema}
-          ${projectsText}`,}
+          {"role": "system", "content": "You are a helpful assistant parsing CVs. Only use the schema for responses. Do not add data that is not in the supplied text" },
+          {"role": "user", "content": `Parse following CV ${text}`,}
         ],
-        response_format: {"type": "json_object"}
+        response_format: zodResponseFormat(ProjectsSchema, 'baseDoc'),
       })
-      .asResponse();
-        const base = await client.chat.completions.create({
-        model: 'gpt-3.5-turbo-0125',
+      const base = await client.beta.chat.completions.parse({
+        model,
         messages: [
-          {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-          {"role": "user", "content": `Parse following CV into JSON fitting this schema ${baseSchema}
-          ${text}`,}
+          {"role": "system", "content": "You are a helpful assistant parsing CVs. Only use the schema for responses. Do not add data that is not in the supplied text" },
+          {"role": "user", "content": `Parse following CV ${text}`,}
         ],
-        response_format: {"type": "json_object"}
-      })
-      .asResponse();
-      const projectsJson = await projects.json()
-      const projectsContent = projectsJson?.choices?.at(0)?.message?.content ?? "{}"
-      const parsedProjects = JSON.parse(projectsContent)
-      // console.log(`parsedProjects `, parsedProjects);
-      const baseJson = await base.json()
-      const baseContent = baseJson?.choices?.at(0)?.message?.content ?? "{}"
-      const parsedBase = JSON.parse(baseContent)
-      // console.log(`parsedBase `, parsedBase);
-      return new Response(JSON.stringify({ message: JSON.stringify({
+        response_format: zodResponseFormat(BaseDoc, 'baseDoc'),
+      });
+      const parsedProjects = projects.choices[0]?.message.parsed ?? {}
+      const parsedBase = base.choices[0]?.message.parsed ?? {}
+      const message =  {
+        ...parsedProjects,
         ...parsedBase,
-        ...parsedProjects
-      }),
-      length: tokens.length
-     }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
-        status: 200,
-      })
-
-    } else {
-      const response = await client.chat.completions.create({
-          model: 'gpt-3.5-turbo-0125',
-          messages: [
-            {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-            {"role": "user", "content": `Parse following CV into JSON fitting this schema ${fullSchema}
-            ${text}`,}
-          ],
-          response_format: {"type": "json_object"}
-        })
-        .asResponse();
-      const json = await response.json()
-      // console.log(`response headers: `, Object.fromEntries(response.headers.entries()));
-      // console.log(`response json: `, json);
-      const message = json?.choices?.at(0)?.message?.content ?? {}
-      // console.log('first choice', json?.choices?.at(0));
-      console.log('choices length', json?.choices?.length);
+      }
       return new Response(JSON.stringify({ message, length: tokens.length }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
         status: 200,
       })
-    }
-    
+    } else {
+      const response = await client.beta.chat.completions.parse({
+          model,
+          messages: [
+            {"role": "system", "content": "You are a helpful assistant parsing CVs. Only use the schema for responses. Do not add data that is not in the supplied text" },
+            {"role": "user", "content": `Parse following CV ${text}`,}
+          ],
+          response_format: zodResponseFormat(FullSchema, 'fullSchema'),
+        })
+      const message = response.choices[0]?.message.parsed ?? {};
+      return new Response(JSON.stringify({ message, length: tokens.length }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, // Be sure to add CORS headers here too
+        status: 200,
+      })
+    }  
     
   } else {
     return new Response(JSON.stringify({ error: 'NOT OK' }), {
