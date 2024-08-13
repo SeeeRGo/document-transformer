@@ -333,7 +333,6 @@ export const createDocument = ({
               highlight: certificates?.length ? undefined : 'red',
               font: 'Arial',
               size: 22,
-
             }),
           ],
           thematicBreak: true
