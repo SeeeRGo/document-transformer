@@ -1,13 +1,34 @@
 import { AlignmentType, Document, HeadingLevel, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
-import { CosysoftCV } from './types'
+import { FullSchema } from './types'
+import z from 'zod'
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
 
+const getYearsText = (years: number) => {
+  if (years % 10 === 1) return 'год'
+  if (years % 10 === 0 || years % 10 > 4) return 'лет'
+  return 'года'
+}
+
+const getDuration = (startDate: string, endDate: string) => {
+  const start = dayjs(startDate, 'MM.YYYY')
+  const end = dayjs(endDate, 'MM.YYYY')
+  const isValidStart = start.isValid()
+  const isValidEnd = end.isValid()
+  if (!isValidEnd) {
+    if (!isValidStart) return 0
+    return dayjs().diff(start, 'month')
+  }
+  return end.diff(start, 'month')
+}
 export const createDocument = ({
   name,
   position,
   grade,
   age,
-  experience,
+  yearsExperience,
   technologies,
   programmingLanguages,
   personalInfo,
@@ -21,7 +42,7 @@ export const createDocument = ({
   operatingSystems,
   devTools,
   certificates
-}: CosysoftCV, branded: boolean): Document => new Document({
+}: z.infer<typeof FullSchema>, branded: boolean): Document => new Document({
   sections: [
     {
       ...createHeader(branded),
@@ -107,8 +128,8 @@ export const createDocument = ({
               size: 28
             }), 
             new TextRun({
-              text: experience ?? '_',
-              highlight: experience ? undefined : 'red',
+              text: yearsExperience ? `${yearsExperience} ${getYearsText(yearsExperience)}` : '_',
+              highlight: yearsExperience ? undefined : 'red',
               font: 'Arial',
               size: 28,
             }),
@@ -127,8 +148,8 @@ export const createDocument = ({
               size: 28,
             }), 
             new TextRun({
-              text: location ?? '_',
-              highlight: location ? undefined : 'red',
+              text: location.country || location.city ? `${location.country ?? ''}${location.city ? ', ' : ''}${location.city ?? ''}` : '_',
+              highlight: location.country || location.city ? undefined : 'red',
               font: 'Arial',
               size: 28,
             }),
@@ -274,7 +295,7 @@ export const createDocument = ({
         ...languages?.length 
           ? languages?.flatMap(language => new Paragraph({ children: [
             new TextRun({
-              text: `${language.name} ${language.level}`,
+              text: `${language.name} - ${language.level}`,
               font: 'Arial',
               size: 22,
             })
@@ -282,28 +303,39 @@ export const createDocument = ({
         }))
           : [new Paragraph({children: [
               new TextRun({
+                text: 'Английский - ',
+                font: 'Arial',
+                size: 22,
+              }),
+              new TextRun({
                 text: '_',
                 highlight:'red',
                 font: 'Arial',
                 size: 22,
               }),
             ]})],
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: 'Образование: ',
-              size: 22,
-              font: 'Arial',
-              bold: true,
-            }),
-            new TextRun({
-              text: education && (Object.keys(education)).length ? `${education.level}, ${education.institution}, ${education.specialization}, ${education.year}` : '_',
-              highlight: education && (Object.keys(education)).length ? undefined : 'red',
-              font: 'Arial',
-              size: 22,
-            })
-          ],
-        }),
+          ...education?.length 
+            ? education?.flatMap(edu => new Paragraph({ children: [
+              new TextRun({
+                text: `${edu.specialization}\n${edu.institution} ${edu.yearGraduated}`,
+                font: 'Arial',
+                size: 22,
+              }),
+              new TextRun({
+                text: `\n`,
+                font: 'Arial',
+                size: 22,
+              }),
+            ],
+          }))
+            : [new Paragraph({children: [
+                new TextRun({
+                  text: '_',
+                  highlight:'red',
+                  font: 'Arial',
+                  size: 22,
+                }),
+              ]})],
         new Paragraph({
           children: [
             new TextRun({
@@ -416,7 +448,7 @@ export const createDocument = ({
                       new Paragraph({
                         children: [
                           new TextRun({
-                            text: project?.duration ?? '',
+                            text: getDuration(project.startDate, project.endDate ?? '') ? `${getDuration(project.startDate, project.endDate ?? '')}` : '',
                             size: 22,
                             font: 'Arial',
                           })
