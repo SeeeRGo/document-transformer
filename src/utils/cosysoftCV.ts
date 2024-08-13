@@ -139,7 +139,7 @@ export const createDocument = ({
             })
           ]
         }), 
-        new Paragraph({ text: '\n\n' }),       
+        new Paragraph({ text: '\n\n', thematicBreak: true }),       
         new Paragraph({
           children: [
             new TextRun({
@@ -335,7 +335,8 @@ export const createDocument = ({
               size: 22,
 
             }),
-          ]
+          ],
+          thematicBreak: true
         }),
         new Paragraph({
           children: [
