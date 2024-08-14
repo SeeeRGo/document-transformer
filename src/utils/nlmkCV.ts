@@ -417,7 +417,7 @@ export const createNlmkDocument = ({
                       },
                     }),
                     new Paragraph({}),
-                    ...duties.flatMap((duty, i) => [createParagraph({
+                    ...duties?.flatMap((duty, i) => [createParagraph({
                       prefix: `${i+1}. ${duty}`,
                       params: {
                         size: 24,

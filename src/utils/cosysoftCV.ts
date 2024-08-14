@@ -379,7 +379,7 @@ export const createDocument = ({
           ],
         }),
         new Paragraph({}),
-        ...projects.flatMap(project => [
+        ...projects?.flatMap(project => [
           new Paragraph({
             children: [
               new TextRun({
