@@ -45,6 +45,7 @@ const fullSchema = `
   }[]
 }
 `
+const model = 'gpt-4o-mini'
 
 const projectNamesSchema = `{
   projects: ${projectSchema}[]
@@ -59,13 +60,13 @@ Deno.serve(async (req: Request) => {
   }
   const { text } = await req.json()  
   if (text) {
-    const encoding = encodingForModel('gpt-3.5-turbo-0125')
+    const encoding = encodingForModel(model)
     const tokens = encoding.encode(text)
     if (tokens.length > 1700) {
       let projectsText = text
       if (tokens.length > 2800) {
         const projectsSummary = await client.chat.completions.create({
-          model: 'gpt-3.5-turbo-0125',
+          model,
           messages: [
             {"role": "system", "content": "You are a helpful assistant carefully extracting information about work experience from CVs"},
             {"role": "user", "content": `Get me information about work experience from this CV in Russian
@@ -77,7 +78,7 @@ Deno.serve(async (req: Request) => {
         
       }
         const projects = await client.chat.completions.create({
-        model: 'gpt-3.5-turbo-0125',
+        model,
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
           {"role": "user", "content": `Parse following CV into JSON fitting this schema ${projectNamesSchema}
@@ -87,7 +88,7 @@ Deno.serve(async (req: Request) => {
       })
       .asResponse();
         const base = await client.chat.completions.create({
-        model: 'gpt-3.5-turbo-0125',
+        model,
         messages: [
           {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
           {"role": "user", "content": `Parse following CV into JSON fitting this schema ${baseSchema}
@@ -116,7 +117,7 @@ Deno.serve(async (req: Request) => {
 
     } else {
       const response = await client.chat.completions.create({
-          model: 'gpt-3.5-turbo-0125',
+          model,
           messages: [
             {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
             {"role": "user", "content": `Parse following CV into JSON fitting this schema ${fullSchema}
