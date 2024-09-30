@@ -148,8 +148,8 @@ export const createDocument = ({
               size: 28,
             }), 
             new TextRun({
-              text: location.country || location.city ? `${location.country ?? ''}${location.city ? ', ' : ''}${location.city ?? ''}` : '_',
-              highlight: location.country || location.city ? undefined : 'red',
+              text: location?.country || location?.city ? `${location.country ?? ''}${location.city ? ', ' : ''}${location.city ?? ''}` : '_',
+              highlight: location?.country || location?.city ? undefined : 'red',
               font: 'Arial',
               size: 28,
             }),
