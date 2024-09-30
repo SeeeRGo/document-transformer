@@ -1,4 +1,4 @@
-import { AlignmentType, Document, HeadingLevel, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { FullSchema } from './types'
 import z from 'zod'
