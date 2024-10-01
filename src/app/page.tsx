@@ -229,13 +229,19 @@ export default function CosysoftTemplate() {
                   })
                 originalLink = publicUrl
               }
-              const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
-              
-              Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
-              .catch(e => {
+              try {
+                const { data: { message: text }}: {data: { message: string }} = await axios.post('/api/extract', formData)
+                Promise.allSettled(templateType.map(type => createFunction({ originalLink, processedName, text, templateType: type })
+                .catch(e => {
+                  console.log('error', e);
+                  setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
+                }))).then(() => { setIsLoading(false) })
+              } catch (e) {
                 console.log('error', e);
-                setError('Произошла ошибка в процессе конвертации резюме, пожалуйста, попробуйте ещё раз')
-              }))).then(() => { setIsLoading(false) })
+                setError('Произошла ошибка в процессе парсинга резюме, пожалуйста, попробуйте ещё раз')
+                setIsLoading(false)
+              }
+              
               // Promise.allSettled(templateType.map(type => {
               //   return axios.post('/api', formData)
               //   .then(async ({data: { message, length }}) => {
