@@ -1,4 +1,4 @@
-import { AlignmentType, Document, HeadingLevel, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { FullSchema } from './types'
 import z from 'zod'
@@ -148,8 +148,8 @@ export const createDocument = ({
               size: 28,
             }), 
             new TextRun({
-              text: location.country || location.city ? `${location.country ?? ''}${location.city ? ', ' : ''}${location.city ?? ''}` : '_',
-              highlight: location.country || location.city ? undefined : 'red',
+              text: location?.country || location?.city ? `${location.country ?? ''}${location.city ? ', ' : ''}${location.city ?? ''}` : '_',
+              highlight: location?.country || location?.city ? undefined : 'red',
               font: 'Arial',
               size: 28,
             }),

@@ -9,6 +9,6 @@ export async function POST(request: NextRequest) {
     input = await resume.arrayBuffer()
   }
   const extractor = getTextExtractor()
-  const text = await extractor.extractText({ input: Buffer.from(input), type: 'file'})
+  const text = await extractor.extractText({ input: Buffer.from(input), type: 'buffer'})
   return Response.json({ message: text ?? '' })
 }

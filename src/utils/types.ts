@@ -44,7 +44,7 @@ export const BaseDoc = z.object({
       location: z.object({
         country: z.string(),
         city: z.string().nullable()
-      }),
+      }).nullable(),
       technologies: z.array(z.string()),
       databases: z.array(z.string()),
       operatingSystems: z.array(z.string()),
@@ -62,7 +62,7 @@ export const BaseDoc = z.object({
         workPermit: z.string(),
         readyToRelocate: z.boolean(),
         readyForBusinessTrips: z.boolean(),
-      }),
+      }).nullable(),
       education: z.array(EducationSchema),
       certificates: z.array(z.string()),
       courses: z.array(z.string()),
