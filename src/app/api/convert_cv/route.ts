@@ -5,7 +5,7 @@ import { getTextExtractor } from 'office-text-extractor'
 interface FileCreateParams {
   text: string
 }
-export const convertBase64 = (file: Blob) => new Promise((resolve, reject) => {
+const convertBase64 = (file: Blob) => new Promise((resolve, reject) => {
   const fileReader = new FileReader()
   fileReader.readAsDataURL(file)
 
