@@ -1,4 +1,4 @@
-import { Document, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { Document, Drawing, HeadingLevel, ImageRun, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
 import { createHeader } from './createHeader';
 import { FullSchema } from './types'
 import z from 'zod'
@@ -159,16 +159,27 @@ export const createDocument = ({
               size: 28,
             })
           ]
-        }), 
-        new Paragraph({ text: '\n\n', thematicBreak: true }),       
+        }),
+        new Paragraph({
+          children: [
+              new ImageRun({
+                  data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyoAAAACAQMAAACNELpCAAAABlBMVEWgoKD///+BiQigAAAAEUlEQVR4nGNgoAdwoIstDA4AGw4AgW1gjFMAAAAASUVORK5CYII=',
+                  transformation: {
+                      width: 600,
+                      height: 2.4,
+                  },
+              }),
+          ],
+      }),
+        new Paragraph({ text: '\n' }),       
         new Paragraph({
           children: [
             new TextRun({
               text: 'Технические навыки: ',
               font: 'Arial',
-              size: 40,
             }),
-          ]
+          ],
+          heading: HeadingLevel.HEADING_1,
         }),
         new Paragraph({}),         
         new Paragraph({
@@ -268,6 +279,17 @@ export const createDocument = ({
           ]
         }),
         new Paragraph({
+          children: [
+              new ImageRun({
+                  data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyoAAAACAQMAAACNELpCAAAABlBMVEWgoKD///+BiQigAAAAEUlEQVR4nGNgoAdwoIstDA4AGw4AgW1gjFMAAAAASUVORK5CYII=',
+                  transformation: {
+                      width: 600,
+                      height: 2.4,
+                  },
+              }),
+          ],
+      }),
+        new Paragraph({
           text: `\n`,
         }),
         new Paragraph({
@@ -275,9 +297,9 @@ export const createDocument = ({
             new TextRun({
               text: `Личная информация: `,
               font: 'Arial',
-              size: 40,
             }),
           ],
+          heading: HeadingLevel.HEADING_1,
         }),
         new Paragraph({
           text: `\n`,
@@ -367,16 +389,15 @@ export const createDocument = ({
               size: 22,
             }),
           ],
-          thematicBreak: true
         }),
         new Paragraph({
           children: [
             new TextRun({
               text: `Проекты: `,
               font: 'Arial',
-              size: 40,
             }),
           ],
+          heading: HeadingLevel.HEADING_1,
         }),
         new Paragraph({}),
         ...projects?.flatMap(project => [
