@@ -1,4 +1,4 @@
-const text9 = `Петр Н.
+export const text9 = `Петр Н.
 
 
 
@@ -218,7 +218,7 @@ Storybook
 
 `
 
-const res = {
+export const res9 = {
   "name": "Петр Н.",
   "position": "Senior Frontend developer",
   "grade": null,

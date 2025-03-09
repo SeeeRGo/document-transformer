@@ -1,4 +1,4 @@
-const test6 = `Александр М.
+export const text6 = `Александр М.
 
 QA-инженер
 
@@ -226,7 +226,7 @@ Charles Proxy, Fiddler, Postman, DevTools, Swagger, Figma, GitHub
 
 `
 
-const res6 = {
+export const res6 = {
   "name": "Александр М.",
   "position": "QA-инженер",
   "grade": null,

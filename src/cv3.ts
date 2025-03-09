@@ -1,4 +1,4 @@
-const text3 = `Максим - Инженер по тестированию 
+export const text3 = `Максим - Инженер по тестированию 
 
 Дата рождения: 04.01.1998 (27 лет)
 
@@ -402,7 +402,7 @@ CRM для банковских систем
 
 `
 
-const res3 = {
+export const res3 = {
   "name": "Максим",
   "position": "QA engineer",
   "grade": "Senior",

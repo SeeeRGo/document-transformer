@@ -1,4 +1,4 @@
-const test4 = `       NETPOLE 
+export const text4 = `       NETPOLE 
 
 
 
@@ -240,7 +240,7 @@ https://netpole.tech/
 
 `
 
-const res4 = {
+export const res4 = {
   "name": "Дмитрий Гундоров",
   "position": "Senior AQA Engineer (Python)",
   "grade": "Senior",

@@ -1,5 +1,5 @@
 
-const text1 = ` 
+export const text1 = ` 
 Данил  - Python разработчик
 
 
@@ -385,7 +385,7 @@ Intermediate
 Образование/Локация - по запросу
 
 `
-const res1 = {
+export const res1 = {
     "name": "Данил",
     "position": "Python разработчик",
     "grade": "Middle+",

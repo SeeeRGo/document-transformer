@@ -1,4 +1,4 @@
-const text7 = `
+export const text7 = `
 
 Болотов Александр
 
@@ -316,7 +316,7 @@ Click2Money
 
 `
 
-const res7 = {
+export const res7 = {
   "name": "Болотов Александр",
   "position": "QA Manual",
   "grade": "Middle+",

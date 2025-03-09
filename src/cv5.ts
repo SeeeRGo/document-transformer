@@ -1,4 +1,4 @@
-const text5 = `ОлегDevOps
+export const text5 = `ОлегDevOps
 
 Гражданство: РФ
 
@@ -358,7 +358,7 @@ Kaspersky Security Center
 
 `
 
-const res5 = {
+export const res5 = {
   "name": "Олег",
   "position": "DevOps-инженер",
   "grade": null,

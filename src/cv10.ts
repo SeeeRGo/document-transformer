@@ -1,4 +1,4 @@
-const test10 = ` 
+export const text10 = ` 
 
 ЖЕРЕБИЛОВ ИВАН
 
@@ -264,7 +264,7 @@ Jira, Confluence, ООП, REST, SOAP UI, Android  Studio.
 
 `
 
-const res10 = {
+export const res10 = {
   "name": "Жеребилов Иван",
   "position": "QA-инженер",
   "grade": "Senior",

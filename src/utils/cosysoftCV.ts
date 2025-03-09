@@ -108,7 +108,7 @@ export const createDocument = ({
               size: 28,
             }), 
             new TextRun({
-              text: `${age}` ?? '_',
+              text: age ? `${age}` : '_',
               highlight: age ? undefined : 'red',
               font: 'Arial',
               size: 28,
@@ -469,7 +469,7 @@ export const createDocument = ({
                       new Paragraph({
                         children: [
                           new TextRun({
-                            text: getDuration(project.startDate, project.endDate ?? '') ? `${getDuration(project.startDate, project.endDate ?? '')}` : '',
+                            text: project.duration,
                             size: 22,
                             font: 'Arial',
                           })

@@ -1,4 +1,4 @@
-const test8 = `	
+export const text8 = `	
 
 
 
@@ -260,7 +260,7 @@ QA Engineer
 
 `
 
-const res8 = {
+export const res8 = {
   "name": "Алексей Л.",
   "position": "QA engineer",
   "grade": null,

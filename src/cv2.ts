@@ -1,4 +1,4 @@
-const cv2 = `Александр Т.
+export const text2 = `Александр Т.
 
 AQA Engineer
 
@@ -192,7 +192,7 @@ AQA Engineer
 
 `
 
-const res2 = {
+export const res2 = {
   "name": "Александр Т.",
   "position": "AQA Engineer",
   "grade": "Middle",

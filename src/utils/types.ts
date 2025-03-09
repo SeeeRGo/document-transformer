@@ -22,8 +22,7 @@ export interface NlmkCV {
 const ProjectSchema = z.object({
   name: z.string(),
   description: z.string(),
-  startDate: z.string().describe('Date of the start of the project. Format date as MM.YYYY'),
-  endDate: z.string().nullable().describe('Date of the end of the project. Format date as MM.YYYY, leave as null if no end date provided'),
+  duration: z.string(),
   role: z.string(),
   duties: z.array(z.string()),
   technologiesUsed: z.array(z.string())
